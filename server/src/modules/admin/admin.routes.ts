@@ -2,9 +2,16 @@ import { Router } from "express";
 import { asyncHandler } from "../../lib/async-handler.js";
 import { validate } from "../../middleware/validate.js";
 import {
+  sessionParamsSchema,
+  updateSessionSchema,
+} from "../sessions/sessions.schema.js";
+import {
   approveWorker,
   assignWorker,
+  deleteSession,
+  listSessions,
   listWorkers,
+  updateSession,
 } from "./admin.controller.js";
 import { approveWorkerSchema, assignWorkerSchema } from "./admin.schema.js";
 
@@ -20,4 +27,15 @@ adminRouter.patch(
   "/workers/:id/assign",
   validate(assignWorkerSchema),
   asyncHandler(assignWorker),
+);
+adminRouter.get("/sessions", asyncHandler(listSessions));
+adminRouter.patch(
+  "/sessions/:id",
+  validate(updateSessionSchema),
+  asyncHandler(updateSession),
+);
+adminRouter.delete(
+  "/sessions/:id",
+  validate(sessionParamsSchema),
+  asyncHandler(deleteSession),
 );
