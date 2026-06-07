@@ -1,0 +1,346 @@
+{
+  "info": {
+    "name": "Dissertation Tool API (Phases 0-3)",
+    "description": "Community Worker M&E Tool — backend API.\n\nBase URL: http://localhost:3000/api\n\nDefault dev credentials (adjust if your DB differs):\n- Admin: 70000001 / password123\n- Supervisor: 26770000098 / password123\n- Worker: 26770000001 / password123\n\nRun Auth → Login (Admin/Supervisor/Worker) first to populate tokens.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api" },
+    { "key": "adminToken", "value": "" },
+    { "key": "supervisorToken", "value": "" },
+    { "key": "workerToken", "value": "" },
+    { "key": "workerId", "value": "CW0001" },
+    { "key": "sessionId", "value": "SESS000001" },
+    { "key": "supervisorId", "value": "SUP01" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "POST Register Worker",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Worker\",\n  \"age\": 28,\n  \"gender\": \"female\",\n  \"phone\": \"26770000099\",\n  \"password\": \"password123\",\n  \"organisation\": \"BONEPWA\",\n  \"workerRole\": \"CDO\",\n  \"education\": \"diploma\",\n  \"district\": \"gaborone\",\n  \"villages\": [\"village_a\"],\n  \"consentGiven\": true\n}"
+            },
+            "url": "{{baseUrl}}/auth/register"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('workerToken', json.token);",
+                  "  if (json.user?.systemId) pm.collectionVariables.set('workerId', json.user.systemId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Login (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"70000001\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.collectionVariables.set('adminToken', pm.response.json().token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Login (Supervisor)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"26770000098\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.collectionVariables.set('supervisorToken', pm.response.json().token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Login (Worker)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"26770000001\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('workerToken', json.token);",
+                  "  if (json.user?.systemId) pm.collectionVariables.set('workerId', json.user.systemId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Me",
+      "item": [
+        {
+          "name": "GET Me (Worker)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{workerToken}}" }],
+            "url": "{{baseUrl}}/me"
+          }
+        },
+        {
+          "name": "GET Me (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/me"
+          }
+        },
+        {
+          "name": "GET Me (Supervisor)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{supervisorToken}}" }],
+            "url": "{{baseUrl}}/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Worker Sessions",
+      "item": [
+        {
+          "name": "POST Create Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{workerToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionDate\": \"2026-06-01\",\n  \"village\": \"village_a\",\n  \"topic\": \"srh\",\n  \"durationMin\": 60,\n  \"nWomen\": 5,\n  \"nMen\": 2,\n  \"nGirls\": 3,\n  \"nBoys\": 1,\n  \"nElders\": 0,\n  \"nOthers\": 0,\n  \"keyIssues\": \"Optional notes\"\n}"
+            },
+            "url": "{{baseUrl}}/sessions"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const id = pm.response.json().session?.sessionId;",
+                  "  if (id) pm.collectionVariables.set('sessionId', id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET List Own Sessions",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{workerToken}}" }],
+            "url": "{{baseUrl}}/sessions"
+          }
+        },
+        {
+          "name": "GET Session By ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{workerToken}}" }],
+            "url": "{{baseUrl}}/sessions/{{sessionId}}"
+          }
+        },
+        {
+          "name": "DELETE Session",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{workerToken}}" }],
+            "url": "{{baseUrl}}/sessions/{{sessionId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "GET All Workers",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/admin/workers"
+          }
+        },
+        {
+          "name": "PATCH Approve Worker",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"approved\": true\n}"
+            },
+            "url": "{{baseUrl}}/admin/workers/{{workerId}}/approve"
+          }
+        },
+        {
+          "name": "PATCH Assign Supervisor",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"supervisorId\": \"{{supervisorId}}\"\n}"
+            },
+            "url": "{{baseUrl}}/admin/workers/{{workerId}}/assign"
+          }
+        },
+        {
+          "name": "GET All Sessions",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/admin/sessions"
+          }
+        },
+        {
+          "name": "PATCH Update Session",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionDate\": \"2026-06-02\",\n  \"village\": \"village_a\",\n  \"topic\": \"srh\",\n  \"durationMin\": 90,\n  \"nWomen\": 6,\n  \"nMen\": 2,\n  \"nGirls\": 3,\n  \"nBoys\": 1,\n  \"nElders\": 0,\n  \"nOthers\": 0\n}"
+            },
+            "url": "{{baseUrl}}/admin/sessions/{{sessionId}}"
+          }
+        },
+        {
+          "name": "DELETE Session",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/admin/sessions/{{sessionId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Supervisor",
+      "item": [
+        {
+          "name": "GET Assigned Workers",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{supervisorToken}}" }],
+            "url": "{{baseUrl}}/supervisor/workers"
+          }
+        },
+        {
+          "name": "GET Workers Sessions",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{supervisorToken}}" }],
+            "url": "{{baseUrl}}/supervisor/sessions"
+          }
+        },
+        {
+          "name": "GET Analytics",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{supervisorToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/supervisor/analytics?from=2026-01-01&to=2026-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["supervisor", "analytics"],
+              "query": [
+                { "key": "from", "value": "2026-01-01", "disabled": true },
+                { "key": "to", "value": "2026-12-31", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET Export PDF",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{supervisorToken}}" }],
+            "url": "{{baseUrl}}/supervisor/export.pdf"
+          }
+        }
+      ]
+    }
+  ]
+}
