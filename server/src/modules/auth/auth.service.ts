@@ -6,14 +6,26 @@ import {
   UsersService,
   type PublicUser,
 } from "../users/users.service.js";
+import {
+  WorkersService,
+  type RegisterWorkerResult,
+} from "../workers/workers.service.js";
+import type { RegisterBody } from "./auth.schema.js";
 
 export interface LoginResult {
   token: string;
   user: PublicUser;
 }
 
+export interface RegisterResult extends RegisterWorkerResult {
+  token: string;
+}
+
 export class AuthService {
-  constructor(private usersService = new UsersService()) {}
+  constructor(
+    private usersService = new UsersService(),
+    private workersService = new WorkersService(),
+  ) {}
 
   async login(phone: string, password: string): Promise<LoginResult> {
     const user = await this.usersService.findByPhone(phone);
@@ -33,6 +45,15 @@ export class AuthService {
 
     const { passwordHash: _, ...publicUser } = user;
     return { token, user: publicUser };
+  }
+
+  async register(body: RegisterBody): Promise<RegisterResult> {
+    const result = await this.workersService.registerWorker(body);
+    const token = signToken({
+      userId: result.user.systemId,
+      role: "worker",
+    });
+    return { token, ...result };
   }
 
   async getMe(userId: string): Promise<PublicUser> {
