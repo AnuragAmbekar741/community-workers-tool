@@ -19,6 +19,9 @@ const baseSchema = z.object({
   LOG_LEVEL: z
     .enum(["fatal", "error", "warn", "info", "debug", "trace"])
     .default("info"),
+  JWT_SECRET: z.string().min(32),
+  JWT_EXPIRES_IN: z.string().min(1).default("7d"),
+  BCRYPT_ROUNDS: z.coerce.number().int().min(10).max(15).default(12),
 });
 
 const schema = baseSchema.superRefine((data, ctx) => {
@@ -35,6 +38,14 @@ const schema = baseSchema.superRefine((data, ctx) => {
         code: "custom",
         message: "Wildcard CORS is not allowed in production",
         path: ["CORS_ORIGINS"],
+      });
+    }
+    const weakSecrets = ["change-me", "dev-only-change-me-use-32-chars-min!!"];
+    if (weakSecrets.includes(data.JWT_SECRET)) {
+      ctx.addIssue({
+        code: "custom",
+        message: "JWT_SECRET must not use a default or documented dev placeholder in production",
+        path: ["JWT_SECRET"],
       });
     }
   }
