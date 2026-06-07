@@ -33,6 +33,38 @@ export const VILLAGE = [
 ] as const;
 export type Village = (typeof VILLAGE)[number];
 
+export const DISTRICT = [
+  "gaborone",
+  "francistown",
+  "lobatse",
+  "selibe_phikwe",
+  "orapa",
+  "jwaneng",
+  "sowa_town",
+  "kanye_moshupa",
+  "barolong",
+  "ngwaketse_west",
+  "south_east",
+  "kweneng_east",
+  "kweneng_west",
+  "kgatleng",
+  "serowe_palapye",
+  "central_mahalapye",
+  "central_bobonong",
+  "central_boteti",
+  "central_tutume",
+  "north_east",
+  "ngamiland_east",
+  "ngamiland_west",
+  "chobe",
+  "delta",
+  "ghanzi",
+  "central_kalahari_game_reserve",
+  "kgalagadi_south",
+  "kgalagadi_north",
+] as const;
+export type District = (typeof DISTRICT)[number];
+
 export const TOPIC = [
   "adolescence_youth_risk",
   "puberty_body_changes",
@@ -53,6 +85,7 @@ export const zGender = z.enum(GENDER);
 export const zWorkerRole = z.enum(WORKER_ROLE);
 export const zEducation = z.enum(EDUCATION);
 export const zVillage = z.enum(VILLAGE);
+export const zDistrict = z.enum(DISTRICT);
 export const zTopic = z.enum(TOPIC);
 export const zWorkerStatus = z.enum(WORKER_STATUS);
 
@@ -63,6 +96,7 @@ export const CONSTANTS = {
   worker_role: WORKER_ROLE,
   education: EDUCATION,
   village: VILLAGE,
+  district: DISTRICT,
   topic: TOPIC,
   worker_status: WORKER_STATUS,
 } as const;

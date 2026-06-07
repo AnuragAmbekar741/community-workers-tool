@@ -67,10 +67,11 @@ Define `as const` objects + derived union types (no TS `enum`):
 | `WORKER_ROLE`   | `CDO`, `SW`, `CHW`, `other`                  |
 | `EDUCATION`     | `none` … `postgrad`                          |
 | `VILLAGE`       | `village_a` … `village_e` (placeholder until locked) |
+| `DISTRICT`      | Urban + rural census districts (see [db_schema.md](./db_schema.md#district-values)) |
 | `TOPIC`         | `adolescence_youth_risk` … `other`           |
 | `WORKER_STATUS` | `pending`, `approved`, `rejected`            |
 
-Export Zod helpers: `zOrganisation`, `zVillage`, etc. for request validation.
+Export Zod helpers: `zOrganisation`, `zVillage`, `zDistrict`, etc. for request validation.
 
 **New file:** `server/src/lib/id-generator.ts` — `generateWorkerId()`, `generateSessionId()` (`CW0001`, `SESS000001` format; query max existing id in repository).
 
@@ -180,6 +181,7 @@ curl http://localhost:3000/api/me -H "Authorization: Bearer <token>"
 | `supervisor_id` | FK → `users.system_id`, nullable      |
 | `worker_role`   | enum constant                         |
 | `education`     | enum constant                         |
+| `district`      | enum constant (`district`)            |
 | `villages`      | `text[]` or jsonb array               |
 | `consent_given` | boolean not null                      |
 
@@ -203,6 +205,7 @@ Methods:
 Business rules:
 
 - Registration: `consent_given` must be `true` → else `ValidationError`
+- `district` must be a valid `DISTRICT` constant
 - Self-register creates `users` row + `workers` row with `status: pending` in a **transaction** (repository or service-orchestrated)
 - Approve/reject: admin only; idempotent guards
 - Assign supervisor: same `organisation` as worker; supervisor must have `role: supervisor`

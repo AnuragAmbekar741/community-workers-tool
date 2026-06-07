@@ -2,7 +2,7 @@
 
 **Version:** 2.2 (pilot scope)
 **Tables:** 3 — `users`, `workers`, `sessions`
-**Server constants (not tables):** organisation, role, gender, worker_role, education, village, topic.
+**Server constants (not tables):** organisation, role, gender, worker_role, education, village, district, topic.
 
 ---
 
@@ -43,6 +43,7 @@
 | supervisor_id | string  | No  | FK → users.system_id (a `SUP0x`, same org). Null until assigned                        |
 | worker_role   | enum    | Yes | `CDO` \| `SW` \| `CHW` \| `other`                                                      |
 | education     | enum    | Yes | none / primary / junior_sec / senior_sec / vocational / diploma / bachelors / postgrad |
+| district      | enum    | Yes | `district` constant (urban or rural census district)                                   |
 | villages      | enum[]  | Yes | Array of `village` constant values (one or more)                                       |
 | consent_given | boolean | Yes | Must be `true` to register                                                             |
 
@@ -81,7 +82,50 @@
 | worker_role  | CDO, SW, CHW, other                                                                                                       |
 | education    | none, primary, junior_sec, senior_sec, vocational, diploma, bachelors, postgrad                                           |
 | village      | village_a, village_b, village_c, village_d, village_e _(finalise before launch)_                                          |
+| district     | See [District values](#district-values) below                                                                               |
 | topic        | adolescence_youth_risk, puberty_body_changes, srh, relationships_gender_norms, consent_gbv, safeguarding_reporting, other |
+
+### District values
+
+Stored as snake_case slugs in code (e.g. `gaborone`, `kanye_moshupa`).
+
+**Urban districts**
+
+| Slug           | Label           |
+| -------------- | --------------- |
+| gaborone       | Gaborone        |
+| francistown    | Francistown     |
+| lobatse        | Lobatse         |
+| selibe_phikwe  | Selibe Phikwe   |
+| orapa          | Orapa           |
+| jwaneng        | Jwaneng         |
+| sowa_town      | Sowa Town       |
+
+**Rural census districts**
+
+| Slug                           | Label                          |
+| ------------------------------ | ------------------------------ |
+| kanye_moshupa                  | Kanye/Moshupa                  |
+| barolong                       | Barolong                       |
+| ngwaketse_west                 | Ngwaketse West                 |
+| south_east                     | South East                     |
+| kweneng_east                   | Kweneng East                   |
+| kweneng_west                   | Kweneng West                   |
+| kgatleng                       | Kgatleng                       |
+| serowe_palapye                 | Serowe/Palapye                 |
+| central_mahalapye              | Central Mahalapye              |
+| central_bobonong               | Central Bobonong               |
+| central_boteti                 | Central Boteti                 |
+| central_tutume                 | Central Tutume                 |
+| north_east                     | North East                     |
+| ngamiland_east                 | Ngamiland East                 |
+| ngamiland_west                 | Ngamiland West                 |
+| chobe                          | Chobe                          |
+| delta                          | Delta                          |
+| ghanzi                         | Ghanzi                         |
+| central_kalahari_game_reserve  | Central Kalahari Game Reserve  |
+| kgalagadi_south                | Kgalagadi South                |
+| kgalagadi_north                | Kgalagadi North                |
 
 ---
 
@@ -92,5 +136,5 @@ users.system_id ──1:1──▶ workers.system_id            (worker profile 
 users.system_id ──1:many──▶ sessions.worker_id         (a worker logs many sessions)
 workers.supervisor_id ──many:1──▶ users.system_id      (worker → supervisor, same org)
 users.organisation ── shared by worker + supervisor    (worker's org = supervisor's org)
-sessions.village / .topic, workers.villages ── validated against server constants
+sessions.village / .topic, workers.villages / .district ── validated against server constants
 ```
