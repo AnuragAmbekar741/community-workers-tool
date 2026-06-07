@@ -27,7 +27,7 @@
 | age           | int       | Yes  | Whole number                                                                   |
 | gender        | enum      | Yes  | `female` \| `male` \| `prefer_not_to_say`                                      |
 | phone         | string    | Yes  | Unique. **Login identifier**                                                   |
-| organisation  | enum      | No   | `org_a` \| `org_b`. **Empty for admin.** Workers and supervisors both set this |
+| organisation  | enum      | No   | `BONEPWA` \| `MAHALAYPEE`. **Empty for admin.** Workers and supervisors both set this |
 | role          | enum      | Yes  | `worker` \| `supervisor` \| `admin`                                            |
 | password_hash | string    | Yes  | Hashed                                                                         |
 | created_at    | timestamp | Auto |                                                                                |
@@ -76,7 +76,7 @@
 
 | Constant     | Values                                                                                                                    |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| organisation | org_a, org_b                                                                                                              |
+| organisation | BONEPWA, MAHALAYPEE                                                                                                        |
 | role         | worker, supervisor, admin                                                                                                 |
 | gender       | female, male, prefer_not_to_say                                                                                           |
 | worker_role  | CDO, SW, CHW, other                                                                                                       |

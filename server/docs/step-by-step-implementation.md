@@ -2,7 +2,7 @@
 
 **Deliverable:** This document — [`server/docs/step-by-step-implementation.md`](./step-by-step-implementation.md).
 
-**Current state (verified):** Steps 1–9 complete — Express 5 factory, production middleware, Pino logging, centralized errors, Drizzle + Postgres pool, `GET /api/health`. No tables, no auth, no business modules. Schema is an empty placeholder in [`server/src/db/schema/index.ts`](../src/db/schema/index.ts).
+**Current state (verified):** Phase 0 complete — shared constants, JWT/bcrypt utilities, auth middleware. Phase 1 in progress — `users` table, login, `/me`. Schema placeholder replaced by `users` in [`server/src/db/schema/users.ts`](../src/db/schema/users.ts).
 
 **Target:** PRD v2.2 — 3 tables, JWT auth, RBAC, 18 business endpoints + `/config`.
 
@@ -24,8 +24,8 @@ Per [backend_rules.md](./backend_rules.md): repositories own all `db` imports; s
 
 | Phase | Title | Status |
 |-------|-------|--------|
-| 0 | Shared foundation (constants, auth utils, middleware) | TODO |
-| 1 | `users` model — schema, repository, service, auth/me | TODO |
+| 0 | Shared foundation (constants, auth utils, middleware) | DONE |
+| 1 | `users` model — schema, repository, service, auth/me | DONE |
 | 2 | `workers` model — schema, repository, service, admin/supervisor routes | TODO |
 | 3 | `sessions` model — schema, repository, service, all session routes + PDF | TODO |
 | 4 | Seed data + config endpoint | TODO |
@@ -61,7 +61,7 @@ Define `as const` objects + derived union types (no TS `enum`):
 
 | Constant        | Values (from [db_schema.md](./db_schema.md)) |
 | --------------- | -------------------------------------------- |
-| `ORGANISATION`  | `org_a`, `org_b`                             |
+| `ORGANISATION`  | `BONEPWA`, `MAHALAYPEE`                      |
 | `ROLE`          | `worker`, `supervisor`, `admin`              |
 | `GENDER`        | `female`, `male`, `prefer_not_to_say`        |
 | `WORKER_ROLE`   | `CDO`, `SW`, `CHW`, `other`                  |
