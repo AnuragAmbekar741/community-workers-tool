@@ -4,6 +4,7 @@ Source of truth for **where code goes** and **how to write it** in `@server/`. F
 
 **Related docs:**
 
+- [auth.md](./auth.md) — HttpOnly cookie JWT auth contract
 - [architecture.md](./architecture.md) — folder structure, request lifecycle, dependencies
 - [step-by-step.md](./step-by-step.md) — incremental build guide
 
@@ -25,7 +26,8 @@ Source of truth for **where code goes** and **how to write it** in `@server/`. F
 7. **Wrap async route handlers in `asyncHandler`** — unhandled promise rejections must reach `errorHandler`
 8. **One concern per layer** — routes wire, controllers translate HTTP, services decide, repositories query
 9. **Validate at the boundary** — Zod schemas on incoming requests; env validated at boot
-10. **No secrets in logs** — never log tokens, passwords, or full `DATABASE_URL`
+10. **No secrets in logs** — never log tokens, passwords, cookie values, or full `DATABASE_URL`
+11. **Never expose JWT in login JSON** — set HttpOnly cookie on login/register; omit `token` from browser response bodies (see [auth.md](./auth.md))
 
 ---
 

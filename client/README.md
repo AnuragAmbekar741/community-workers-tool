@@ -19,6 +19,8 @@ npm run preview  # preview production build
 
 ## API
 
-Default API base URL: `http://localhost:3000/api` (override with `VITE_API_BASE_URL` in `.env.development`).
+Auth uses **HttpOnly cookies** set by the server — see [../server/docs/auth.md](../server/docs/auth.md).
+
+**Local dev:** `.env.development` sets `VITE_API_BASE_URL=/api`. Vite proxies `/api` to `http://localhost:3000` so cookies work same-origin. Start the server on port 3000 before using auth.
 
 See [../server/docs/dissertation-tool-api.postman_collection.json](../server/docs/dissertation-tool-api.postman_collection.json) for endpoint reference.

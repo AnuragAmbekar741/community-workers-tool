@@ -42,7 +42,8 @@ URL map, auth guards, and feature folder mapping for the client app. Implement w
 
 ### Token expiry (401)
 
-- Clear JWT from `localStorage` (`auth:v1`)
+- Call `POST /auth/logout` to clear HttpOnly cookie (optional if already expired)
+- Invalidate React Query `me` cache
 - Redirect to `/login`
 
 ### Own-session check

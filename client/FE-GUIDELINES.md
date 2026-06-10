@@ -6,6 +6,7 @@ Source of truth for **where code goes** and **how to write it** in `@client/`. F
 
 - [docs/flows/worker-app-flow.md](./docs/flows/worker-app-flow.md) — worker user journey and screen actions
 - [docs/routes.md](./docs/routes.md) — planned URL map and route guards
+- [../server/docs/auth.md](../server/docs/auth.md) — HttpOnly cookie JWT auth contract
 - [../server/docs/backend_rules.md](../server/docs/backend_rules.md) — server conventions and API error shapes
 - [../server/docs/architecture.md](../server/docs/architecture.md) — server folder structure and request lifecycle
 - [../server/docs/dissertation-tool-api.postman_collection.json](../server/docs/dissertation-tool-api.postman_collection.json) — API endpoints and example payloads
@@ -237,14 +238,12 @@ export type AuthResponse = {
 };
 
 // src/api/auth-api.ts
-import { apiClient } from "./client";
-import type { AuthResponse, LoginRequest } from "@/types/auth";
+import { api } from "./client";
+import type { LoginRequest, LoginResponse } from "@/types/auth";
 
-export async function login(body: LoginRequest): Promise<AuthResponse> {
-  return apiClient<AuthResponse>("/auth/login", {
-    method: "POST",
-    body: JSON.stringify(body),
-  });
+export async function login(body: LoginRequest): Promise<LoginResponse> {
+  const { data } = await api.post<LoginResponse>("/auth/login", body);
+  return data;
 }
 
 // src/hooks/use-login.ts
@@ -355,76 +354,30 @@ createRoot(document.getElementById("root")!).render(
 );
 ```
 
-### `api/client.ts` — shared fetch wrapper
+### `api/client.ts` — axios instance (HttpOnly cookie auth)
+
+JWT is stored in an **HttpOnly cookie** set by the server. The browser attaches it automatically — do **not** use `localStorage` or `Authorization` headers in the SPA.
 
 ```typescript
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000/api";
+import axios from "axios";
 
-const AUTH_TOKEN_KEY = "auth:v1";
+export const api = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? "/api",
+  withCredentials: true,
+  headers: { "Content-Type": "application/json" },
+});
 
-export class ApiError extends Error {
-  constructor(
-    message: string,
-    public status: number,
-    public body?: unknown,
-  ) {
-    super(message);
-    this.name = "ApiError";
-  }
-}
-
-export function getAuthToken(): string | null {
-  try {
-    return localStorage.getItem(AUTH_TOKEN_KEY);
-  } catch {
-    return null;
-  }
-}
-
-export function setAuthToken(token: string): void {
-  try {
-    localStorage.setItem(AUTH_TOKEN_KEY, token);
-  } catch {
-    // private browsing or quota exceeded
-  }
-}
-
-export async function apiClient<T>(
-  path: string,
-  init: RequestInit = {},
-): Promise<T> {
-  const token = getAuthToken();
-  const headers = new Headers(init.headers);
-
-  if (!headers.has("Content-Type") && init.body) {
-    headers.set("Content-Type", "application/json");
-  }
-  if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
-  }
-
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...init,
-    headers,
-  });
-
-  if (!response.ok) {
-    const body: unknown = await response.json().catch(() => undefined);
-    throw new ApiError(
-      `Request failed: ${response.status}`,
-      response.status,
-      body,
-    );
-  }
-
-  if (response.status === 204) {
-    return undefined as T;
-  }
-
-  return response.json() as Promise<T>;
-}
+api.interceptors.response.use(
+  (res) => res,
+  (error) => Promise.reject(error),
+);
 ```
+
+- Dev: Vite proxies `/api` → `http://localhost:3000` so cookies are same-origin
+- Auth state: `GET /me` via `useMe()` — 200 = logged in, 401 = not
+- Logout: `POST /auth/logout` then invalidate `me` query cache
+
+See [../server/docs/auth.md](../server/docs/auth.md).
 
 ### Layer rules
 
@@ -490,8 +443,7 @@ Relevant checklist from Vercel React best practices for this Vite SPA:
 | Barrel imports        | Import from `@/components/base/button`, not `@/components/base` index       |
 | Functional setState   | Use `setItems((curr) => ...)` for stable callbacks in lists/forms           |
 | Lazy state init       | `useState(() => expensiveInit())` for costly initial values                 |
-| Cache storage reads   | Cache `localStorage` token reads in a module-level `Map` if read frequently |
-| Version localStorage  | Auth token key: `auth:v1` — bump version on schema change                   |
+| Cookie auth           | `withCredentials: true` on axios; never store JWT in JS                      |
 | Derive during render  | Compute filtered/sorted lists during render with `useMemo` when expensive   |
 | Event handlers        | Put submit/click logic in handlers, not `useEffect`                         |
 
