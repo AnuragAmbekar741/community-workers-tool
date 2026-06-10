@@ -5,6 +5,9 @@ Vite + React 19 + TypeScript frontend for the Community Worker M&E Tool.
 ## Docs
 
 - **[FE-GUIDELINES.md](./FE-GUIDELINES.md)** — frontend source of truth: styles, folder structure, naming, types, API/hooks, and component patterns
+- **[docs/](./docs/)** — user flows, screen specs, and planned routes
+  - [Worker app flow](./docs/flows/worker-app-flow.md)
+  - [Routes](./docs/routes.md)
 
 ## Scripts
 

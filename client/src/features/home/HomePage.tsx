@@ -7,7 +7,7 @@ import {
 } from "@/components/base/card";
 import { Input } from "@/components/base/input";
 
-function App() {
+export function HomePage() {
   return (
     <main className="mx-auto min-h-dvh max-w-lg space-y-4 p-4">
       <h1>Page Title</h1>
@@ -26,5 +26,3 @@ function App() {
     </main>
   );
 }
-
-export default App;

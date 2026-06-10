@@ -4,6 +4,8 @@ Source of truth for **where code goes** and **how to write it** in `@client/`. F
 
 **Related docs:**
 
+- [docs/flows/worker-app-flow.md](./docs/flows/worker-app-flow.md) — worker user journey and screen actions
+- [docs/routes.md](./docs/routes.md) — planned URL map and route guards
 - [../server/docs/backend_rules.md](../server/docs/backend_rules.md) — server conventions and API error shapes
 - [../server/docs/architecture.md](../server/docs/architecture.md) — server folder structure and request lifecycle
 - [../server/docs/dissertation-tool-api.postman_collection.json](../server/docs/dissertation-tool-api.postman_collection.json) — API endpoints and example payloads
@@ -35,19 +37,19 @@ Source of truth for **where code goes** and **how to write it** in `@client/`. F
 
 ### Brand palette
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| **Brand / primary** | `#D73F09` | CTAs, links, active states, focus rings |
-| **Foreground** | `zinc-800` (`#27272a`) | Body text, headings on light backgrounds |
-| **Background** | `#ffffff` | Page and card surfaces |
-| **Primary foreground** | `#ffffff` | Text on brand buttons |
-| **Muted text** | `zinc-500` (`#71717a`) | Secondary labels, descriptions |
-| **Border** | `zinc-200` (`#e4e4e7`) | Inputs, cards, dividers |
+| Token                  | Value                  | Usage                                    |
+| ---------------------- | ---------------------- | ---------------------------------------- |
+| **Brand / primary**    | `#D73F09`              | CTAs, links, active states, focus rings  |
+| **Foreground**         | `zinc-800` (`#27272a`) | Body text, headings on light backgrounds |
+| **Background**         | `#ffffff`              | Page and card surfaces                   |
+| **Primary foreground** | `#ffffff`              | Text on brand buttons                    |
+| **Muted text**         | `zinc-500` (`#71717a`) | Secondary labels, descriptions           |
+| **Border**             | `zinc-200` (`#e4e4e7`) | Inputs, cards, dividers                  |
 
 These map to shadcn CSS variables in `src/global.css`:
 
 ```css
---primary: #D73F09;
+--primary: #d73f09;
 --primary-foreground: #ffffff;
 --foreground: #27272a;
 --background: #ffffff;
@@ -57,11 +59,11 @@ These map to shadcn CSS variables in `src/global.css`:
 
 Semantic Tailwind aliases (via `@theme inline`):
 
-| Class | Token |
-|-------|-------|
-| `bg-brand` / `text-brand` | `--color-brand` (`#D73F09`) |
-| `text-ink` | `--color-ink` (`#27272a`) |
-| `bg-surface` | `--color-surface` (`#ffffff`) |
+| Class                     | Token                         |
+| ------------------------- | ----------------------------- |
+| `bg-brand` / `text-brand` | `--color-brand` (`#D73F09`)   |
+| `text-ink`                | `--color-ink` (`#27272a`)     |
+| `bg-surface`              | `--color-surface` (`#ffffff`) |
 
 Prefer shadcn semantic classes (`bg-primary`, `text-foreground`, `text-muted-foreground`) in components. Use `brand` / `ink` / `surface` only when you need explicit brand references outside the default token mapping.
 
@@ -79,17 +81,17 @@ Prefer shadcn semantic classes (`bg-primary`, `text-foreground`, `text-muted-for
 
 Pick from this table only. Do not invent ad-hoc `text-*` / `font-*` combinations.
 
-| Token | Element | Size | Weight | Line-height | Tailwind (allowed) |
-|-------|---------|------|--------|-------------|-------------------|
-| `display` | Marketing hero only | 32px | 600 | 1.25 | `text-display` |
-| `title-lg` | `h1` page title | 24px | 600 | 1.3 | `text-2xl font-semibold` |
-| `title-md` | `h2` section | 18px | 600 | 1.35 | `text-lg font-semibold` |
-| `title-sm` | `h3` subsection | 16px | 600 | 1.4 | `text-base font-semibold` |
-| `body` | `body`, `p` | 16px | 400 | 1.5 | `text-base font-normal` |
-| `body-sm` | tables, compact lists | 14px | 400 | 1.5 | `text-sm font-normal` |
-| `label` | form labels, `th` | 14px | 500 | 1.4 | `text-sm font-medium` |
-| `caption` | hints, timestamps | 12px | 400 | 1.4 | `text-xs font-normal` |
-| `button` | buttons | 14px | 500 | 1.0 | `text-sm font-medium` |
+| Token      | Element               | Size | Weight | Line-height | Tailwind (allowed)        |
+| ---------- | --------------------- | ---- | ------ | ----------- | ------------------------- |
+| `display`  | Marketing hero only   | 32px | 600    | 1.25        | `text-display`            |
+| `title-lg` | `h1` page title       | 24px | 600    | 1.3         | `text-2xl font-semibold`  |
+| `title-md` | `h2` section          | 18px | 600    | 1.35        | `text-lg font-semibold`   |
+| `title-sm` | `h3` subsection       | 16px | 600    | 1.4         | `text-base font-semibold` |
+| `body`     | `body`, `p`           | 16px | 400    | 1.5         | `text-base font-normal`   |
+| `body-sm`  | tables, compact lists | 14px | 400    | 1.5         | `text-sm font-normal`     |
+| `label`    | form labels, `th`     | 14px | 500    | 1.4         | `text-sm font-medium`     |
+| `caption`  | hints, timestamps     | 12px | 400    | 1.4         | `text-xs font-normal`     |
+| `button`   | buttons               | 14px | 500    | 1.0         | `text-sm font-medium`     |
 
 **Base body is 16px** (`text-base`) on all viewports — required for mobile readability and to prevent iOS input zoom.
 
@@ -110,19 +112,19 @@ Do **not** use these in feature code:
 
 Three-tier token system defined in `global.css` `@theme inline`:
 
-| Token | Value | Use | Tailwind class |
-|-------|-------|-----|----------------|
-| `radius-sm` | 4px | checkbox, chips, tags, select items | `rounded-sm` |
-| `radius-md` | 6px | inputs, buttons, select triggers, popovers | `rounded-md` |
-| `radius-lg` | 8px | cards, dialogs | `rounded-lg` |
+| Token       | Value | Use                                        | Tailwind class |
+| ----------- | ----- | ------------------------------------------ | -------------- |
+| `radius-sm` | 4px   | checkbox, chips, tags, select items        | `rounded-sm`   |
+| `radius-md` | 6px   | inputs, buttons, select triggers, popovers | `rounded-md`   |
+| `radius-lg` | 8px   | cards, dialogs                             | `rounded-lg`   |
 
 Base components map to these tiers:
 
-| Component | Radius class |
-|-----------|--------------|
+| Component                                   | Radius class |
+| ------------------------------------------- | ------------ |
 | `Button`, `Input`, `Select` trigger/content | `rounded-md` |
-| `Card` | `rounded-lg` |
-| `Checkbox`, `Select` items | `rounded-sm` |
+| `Card`                                      | `rounded-lg` |
+| `Checkbox`, `Select` items                  | `rounded-sm` |
 
 #### Forbidden radius classes
 
@@ -179,14 +181,14 @@ client/src/
 
 ### Where code goes
 
-| I need to… | Put it in… |
-|------------|------------|
-| Call an HTTP endpoint | `src/api/<domain>-api.ts` |
-| Expose data to components | `src/hooks/use-<thing>.ts` |
-| Define request/response shapes | `src/types/<domain>.ts` |
-| Reusable UI primitive | `src/components/base/` |
+| I need to…                     | Put it in…                     |
+| ------------------------------ | ------------------------------ |
+| Call an HTTP endpoint          | `src/api/<domain>-api.ts`      |
+| Expose data to components      | `src/hooks/use-<thing>.ts`     |
+| Define request/response shapes | `src/types/<domain>.ts`        |
+| Reusable UI primitive          | `src/components/base/`         |
 | Feature-specific screen/widget | `src/features/<feature-name>/` |
-| Framework-agnostic helper | `src/lib/` |
+| Framework-agnostic helper      | `src/lib/`                     |
 
 ---
 
@@ -482,16 +484,16 @@ Components must not call `fetch` directly. All server communication goes through
 
 Relevant checklist from Vercel React best practices for this Vite SPA:
 
-| Rule | Practice |
-|------|----------|
-| Request deduplication | React Query deduplicates in-flight queries with the same key |
-| Barrel imports | Import from `@/components/base/button`, not `@/components/base` index |
-| Functional setState | Use `setItems((curr) => ...)` for stable callbacks in lists/forms |
-| Lazy state init | `useState(() => expensiveInit())` for costly initial values |
-| Cache storage reads | Cache `localStorage` token reads in a module-level `Map` if read frequently |
-| Version localStorage | Auth token key: `auth:v1` — bump version on schema change |
-| Derive during render | Compute filtered/sorted lists during render with `useMemo` when expensive |
-| Event handlers | Put submit/click logic in handlers, not `useEffect` |
+| Rule                  | Practice                                                                    |
+| --------------------- | --------------------------------------------------------------------------- |
+| Request deduplication | React Query deduplicates in-flight queries with the same key                |
+| Barrel imports        | Import from `@/components/base/button`, not `@/components/base` index       |
+| Functional setState   | Use `setItems((curr) => ...)` for stable callbacks in lists/forms           |
+| Lazy state init       | `useState(() => expensiveInit())` for costly initial values                 |
+| Cache storage reads   | Cache `localStorage` token reads in a module-level `Map` if read frequently |
+| Version localStorage  | Auth token key: `auth:v1` — bump version on schema change                   |
+| Derive during render  | Compute filtered/sorted lists during render with `useMemo` when expensive   |
+| Event handlers        | Put submit/click logic in handlers, not `useEffect`                         |
 
 ### Direct imports (required)
 
@@ -515,8 +517,8 @@ npx shadcn@latest add <component> -p src/components/base -y -o
 
 ## Environment variables
 
-| Variable | Default | Purpose |
-|----------|---------|---------|
+| Variable            | Default                     | Purpose              |
+| ------------------- | --------------------------- | -------------------- |
 | `VITE_API_BASE_URL` | `http://localhost:3000/api` | Express API base URL |
 
 Add to `client/.env.development` (gitignored) as needed:
