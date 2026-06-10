@@ -140,7 +140,7 @@ Worker screens are primarily mobile. Follow these rules on every page:
 - **No horizontal scroll** — use `max-w-full` on containers; page shells use `overflow-x-hidden` on `body`
 - **Viewport height** — use `min-h-dvh`, not `min-h-screen` / `100vh`
 - **Breakpoints** — mobile-first: default → `sm:` (640px) → `md:` (768px) → `lg:` (1024px)
-- **Touch targets** — primary actions on worker screens need ≥44px height; upgrade to `h-11` when building worker forms (base `Button`/`Input` default `h-8` is compact — acceptable for admin, not worker CTAs)
+- **Touch targets** — base `Button` uses `px-3 py-1.5` globally; `Input` default remains compact (`h-8`)
 - **Form labels** — always visible; never placeholder-only labels
 - **Errors** — show below the related field, not only at page top
 - **Padding** — page content uses `p-4` minimum on mobile; avoid edge-to-edge text
