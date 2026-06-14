@@ -1,6 +1,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
+import { getDataTableRowSelectColumn } from "@/components/data-table/data-table-row-select-column";
 import {
   DISTRICT_OPTIONS,
   ORGANISATION_OPTIONS,
@@ -10,23 +11,31 @@ import {
 import { getOptionLabel } from "@/lib/option-label";
 import type { AdminWorkerListItem } from "@/types/admin";
 
-import { WorkerApproveActions } from "./WorkerApproveActions";
+import { WorkerStatusSelect } from "./WorkerStatusSelect";
 
 type GetWorkersColumnsOptions = {
-  showActions: boolean;
+  enableSelection: boolean;
 };
 
 export function getWorkersColumns({
-  showActions,
+  enableSelection,
 }: GetWorkersColumnsOptions): ColumnDef<AdminWorkerListItem>[] {
-  const columns: ColumnDef<AdminWorkerListItem>[] = [
+  const columns: ColumnDef<AdminWorkerListItem>[] = [];
+
+  if (enableSelection) {
+    columns.push(getDataTableRowSelectColumn<AdminWorkerListItem>());
+  }
+
+  columns.push(
     {
       id: "systemId",
       accessorFn: (row) => row.user.systemId,
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="System ID" />
       ),
-      cell: ({ row }) => row.original.user.systemId,
+      cell: ({ row }) => (
+        <span className="font-medium">{row.original.user.systemId}</span>
+      ),
     },
     {
       id: "role",
@@ -74,24 +83,20 @@ export function getWorkersColumns({
       cell: ({ row }) =>
         getOptionLabel(ORGANISATION_OPTIONS, row.original.user.organisation),
     },
-  ];
-
-  if (showActions) {
-    columns.push({
-      id: "actions",
-      header: "Actions",
-      cell: ({ row }) => {
-        if (row.original.worker.status !== "pending") {
-          return null;
-        }
-
-        return (
-          <WorkerApproveActions workerId={row.original.worker.systemId} />
-        );
-      },
-      enableSorting: false,
-    });
-  }
+    {
+      id: "status",
+      accessorFn: (row) => row.worker.status,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Status" />
+      ),
+      cell: ({ row }) => (
+        <WorkerStatusSelect
+          workerId={row.original.worker.systemId}
+          status={row.original.worker.status}
+        />
+      ),
+    },
+  );
 
   return columns;
 }

@@ -90,3 +90,18 @@ export function getDashboardHomePath(role: Role): string {
       return "/worker";
   }
 }
+
+export function getCurrentNavItem(
+  role: Role,
+  pathname: string,
+): DashboardNavItem | null {
+  const navItems = getDashboardNav(role);
+
+  return (
+    navItems.find((item) =>
+      item.end
+        ? pathname === item.path
+        : pathname === item.path || pathname.startsWith(`${item.path}/`),
+    ) ?? null
+  );
+}

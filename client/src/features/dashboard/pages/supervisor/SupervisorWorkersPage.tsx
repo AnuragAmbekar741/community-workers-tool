@@ -1,6 +1,6 @@
 export function SupervisorWorkersPage() {
   return (
-    <div className="space-y-4">
+    <div className="flex-1 space-y-4 overflow-y-auto">
       <p className="text-base text-muted-foreground">
         Workers assigned to you by an admin. This screen will list worker
         profiles from <code className="text-sm">GET /supervisor/workers</code>.

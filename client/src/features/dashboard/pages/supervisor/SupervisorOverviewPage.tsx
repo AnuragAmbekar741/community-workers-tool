@@ -15,7 +15,7 @@ export function SupervisorOverviewPage() {
     : "—";
 
   return (
-    <div className="space-y-6">
+    <div className="flex-1 space-y-6 overflow-y-auto">
       <div className="space-y-1">
         <p className="text-base text-muted-foreground">
           Track your assigned workers and their community sessions.

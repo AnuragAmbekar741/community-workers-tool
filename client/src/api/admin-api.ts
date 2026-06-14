@@ -3,6 +3,7 @@ import type {
   ListWorkersResponse,
   WorkerStatusFilter,
 } from "@/types/admin";
+import type { ListSessionsResponse } from "@/types/session";
 
 import { api } from "./client";
 
@@ -23,5 +24,10 @@ export async function approveWorker(
     `/admin/workers/${workerId}/approve`,
     { approved },
   );
+  return data;
+}
+
+export async function listSessions(): Promise<ListSessionsResponse> {
+  const { data } = await api.get<ListSessionsResponse>("/admin/sessions");
   return data;
 }

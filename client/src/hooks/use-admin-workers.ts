@@ -7,6 +7,7 @@ export const adminKeys = {
   all: ["admin"] as const,
   workers: (status?: WorkerStatusFilter) =>
     [...adminKeys.all, "workers", status ?? "all"] as const,
+  sessions: () => [...adminKeys.all, "sessions"] as const,
 };
 
 export function useAdminWorkers(status?: WorkerStatusFilter) {

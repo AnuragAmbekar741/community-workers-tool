@@ -48,6 +48,15 @@ export const VILLAGE = [
   "village_d",
   "village_e",
 ] as const;
+export const TOPIC = [
+  "adolescence_youth_risk",
+  "puberty_body_changes",
+  "srh",
+  "relationships_gender_norms",
+  "consent_gbv",
+  "safeguarding_reporting",
+  "other",
+] as const;
 
 export type Gender = (typeof GENDER)[number];
 export type Organisation = (typeof ORGANISATION)[number];
@@ -55,6 +64,7 @@ export type WorkerRole = (typeof WORKER_ROLE)[number];
 export type Education = (typeof EDUCATION)[number];
 export type District = (typeof DISTRICT)[number];
 export type Village = (typeof VILLAGE)[number];
+export type Topic = (typeof TOPIC)[number];
 
 export const GENDER_OPTIONS = [
   { value: "female", label: "Female" },
@@ -126,3 +136,13 @@ export const VILLAGE_OPTIONS = [
   { value: "village_d", label: "Village D" },
   { value: "village_e", label: "Village E" },
 ] as const satisfies ReadonlyArray<{ value: Village; label: string }>;
+
+export const TOPIC_OPTIONS = [
+  { value: "adolescence_youth_risk", label: "Adolescence & youth risk" },
+  { value: "puberty_body_changes", label: "Puberty & body changes" },
+  { value: "srh", label: "Sexual & reproductive health" },
+  { value: "relationships_gender_norms", label: "Relationships & gender norms" },
+  { value: "consent_gbv", label: "Consent & GBV" },
+  { value: "safeguarding_reporting", label: "Safeguarding & reporting" },
+  { value: "other", label: "Other" },
+] as const satisfies ReadonlyArray<{ value: Topic; label: string }>;

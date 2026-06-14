@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 
 import { Button } from "@/components/base/button";
+import { useAdminSessions } from "@/hooks/use-admin-sessions";
 import { useAdminWorkers } from "@/hooks/use-admin-workers";
 import { useMe } from "@/hooks/use-me";
 import { ORGANISATION_OPTIONS } from "@/lib/constants";
@@ -11,16 +12,18 @@ export function AdminOverviewPage() {
   const { data: user } = useMe();
   const { data: allWorkers } = useAdminWorkers();
   const { data: pendingWorkers } = useAdminWorkers("pending");
+  const { data: allSessions } = useAdminSessions();
 
   const totalCount = allWorkers?.workers.length ?? 0;
   const pendingCount = pendingWorkers?.workers.length ?? 0;
+  const sessionCount = allSessions?.sessions.length ?? 0;
   const organisationLabel = user?.organisation
     ? (ORGANISATION_OPTIONS.find((option) => option.value === user.organisation)
         ?.label ?? user.organisation)
     : null;
 
   return (
-    <div className="space-y-6">
+    <div className="flex-1 space-y-6 overflow-y-auto">
       <div className="space-y-1">
         <p className="text-base text-muted-foreground">
           Monitor worker registrations and session activity across the
@@ -41,8 +44,8 @@ export function AdminOverviewPage() {
         />
         <OverviewStatCard
           title="All sessions"
-          value="—"
-          description="Session management coming soon"
+          value={sessionCount}
+          description="Logged community sessions"
         />
       </div>
 
