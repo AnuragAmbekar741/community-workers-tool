@@ -1,13 +1,21 @@
+import type {
+  District,
+  Education,
+  Gender,
+  Organisation,
+  Village,
+  WorkerRole,
+} from "@/lib/constants";
 import type { UserDto } from "./user";
 
 export type WorkerDto = {
   systemId: string;
   status: "pending" | "approved" | "rejected";
   supervisorId: string | null;
-  workerRole: string;
-  education: string;
-  district: string;
-  villages: string[];
+  workerRole: WorkerRole;
+  education: Education;
+  district: District;
+  villages: Village[];
   consentGiven: boolean;
 };
 
@@ -23,14 +31,14 @@ export type LoginResponse = {
 export type RegisterRequest = {
   name: string;
   age: number;
-  gender: string;
+  gender: Gender;
   phone: string;
   password: string;
-  organisation: string;
-  workerRole: string;
-  education: string;
-  district: string;
-  villages: string[];
+  organisation: Organisation;
+  workerRole: WorkerRole;
+  education: Education;
+  district: District;
+  villages: Village[];
   consentGiven: true;
 };
 
