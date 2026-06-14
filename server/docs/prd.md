@@ -25,7 +25,7 @@ Three roles, enforced **server-side**. Every request carries a JWT with `{ userI
 | Capability                        | Worker | Supervisor | Admin |
 | --------------------------------- | :----: | :--------: | :---: |
 | Self-register                     |   ✅   |     —      |   —   |
-| Log in (re-login on token expiry) |   ✅   |     ✅     |  ✅   |
+| Log in (re-login on token expiry) | ✅\* |     ✅     |  ✅   |
 | Add a session                     |  ✅\*  |     —      |   —   |
 | View own sessions (list + detail) |   ✅   |     —      |   —   |
 | Delete own session                |   ✅   |     —      |   —   |
@@ -41,9 +41,11 @@ Three roles, enforced **server-side**. Every request carries a JWT with `{ userI
 
 \* Only after `workers.status = approved`.
 
+\* Workers may log in only after `workers.status = approved`. Session creation also requires approval.
+
 **Middleware:** `requireAuth` (valid JWT) → `requireRole(...)` → ownership check (worker only own sessions; supervisor only workers where `supervisor_id = self`).
 
-**Auth model:** login is **phone + password** for everyone. JWT in an **HttpOnly cookie** (set by server on login/register; cleared on logout) — no token in browser JSON, no PIN, no refresh token. Cookie expiry → log in again. See [auth.md](./auth.md).
+**Auth model:** login is **phone or system_id** plus **password** for everyone. JWT in an **HttpOnly cookie** (set by server on login only; cleared on logout) — no token in browser JSON, no PIN, no refresh token. Cookie expiry → log in again. See [auth.md](./auth.md).
 
 ---
 
@@ -62,9 +64,9 @@ SEEDED                         WORKER SELF-SERVE FLOW
 ```
 
 - Admin + both supervisors are seeded (no signup path for them).
-- **Registration is workers-only.** A worker can log in while `pending` but cannot add sessions until approved.
-- Approval and supervisor assignment are admin actions (can be done together).
-- **Org mapping:** workers and supervisors both belong to an org. A worker is assigned to a supervisor **in the same org** — that assignment is how a worker is tied to their org.
+- **Registration is workers-only.** Workers select their **organisation** at registration (not assigned by admin). Registration creates a `pending` account; workers **cannot** log in until admin approves.
+- Approval and supervisor assignment are admin actions (can be done together). Admin assigns a supervisor only — not organisation.
+- **Org mapping:** workers and supervisors both belong to an org. A worker picks their org at registration; admin assigns them to a supervisor **in the same org**.
 
 ---
 
@@ -72,8 +74,8 @@ SEEDED                         WORKER SELF-SERVE FLOW
 
 ### Worker
 
-- Create an account (self-register → `pending`).
-- Log in; re-login when token expires.
+- Create an account (self-register → `pending`; select organisation during registration).
+- Log in after admin approval; re-login when token expires (phone or system_id).
 - Add session details (once approved).
 - View list of own sessions / view one session.
 - Delete an own session.
@@ -107,8 +109,8 @@ SEEDED                         WORKER SELF-SERVE FLOW
 
 | Method | Path             | Access | Purpose                                     |
 | ------ | ---------------- | ------ | ------------------------------------------- |
-| POST   | `/auth/register` | 🔓     | **Worker-only** self-registration → pending |
-| POST   | `/auth/login`    | 🔓     | Login (all roles), phone + password → HttpOnly cookie |
+| POST   | `/auth/register` | 🔓     | **Worker-only** self-registration → pending (no auth cookie) |
+| POST   | `/auth/login`    | 🔓     | Login (all roles), phone or system_id + password → HttpOnly cookie |
 | POST   | `/auth/logout`   | 🔓     | Clear auth cookie                           |
 | GET    | `/me`            | 👤🧑‍🏫🛡️ | Current user's own profile                  |
 

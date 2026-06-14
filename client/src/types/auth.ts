@@ -19,10 +19,15 @@ export type WorkerDto = {
   consentGiven: boolean;
 };
 
-export type LoginRequest = {
-  phone: string;
-  password: string;
-};
+export type LoginRequest =
+  | {
+      phone: string;
+      password: string;
+    }
+  | {
+      systemId: string;
+      password: string;
+    };
 
 export type LoginResponse = {
   user: UserDto;

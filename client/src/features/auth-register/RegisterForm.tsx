@@ -57,7 +57,7 @@ export function RegisterForm() {
     setRootError(null);
     try {
       await registerMutation.mutateAsync(toRegisterRequest(values));
-      navigate("/worker", { replace: true });
+      navigate("/login?registered=pending", { replace: true });
     } catch (error) {
       if (isApiError(error)) {
         setRootError(error.message);

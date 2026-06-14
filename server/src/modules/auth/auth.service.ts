@@ -1,5 +1,9 @@
 import type { Role } from "../../constants/index.js";
-import { UnauthorizedError } from "../../lib/errors.js";
+import type { User } from "../../db/schema/users.js";
+import {
+  ForbiddenError,
+  UnauthorizedError,
+} from "../../lib/errors.js";
 import { signToken } from "../../lib/jwt.js";
 import { verifyPassword } from "../../lib/password.js";
 import {
@@ -10,16 +14,14 @@ import {
   WorkersService,
   type RegisterWorkerResult,
 } from "../workers/workers.service.js";
-import type { RegisterBody } from "./auth.schema.js";
+import type { LoginBody, RegisterBody } from "./auth.schema.js";
 
 export interface LoginResult {
   token: string;
   user: PublicUser;
 }
 
-export interface RegisterResult extends RegisterWorkerResult {
-  token: string;
-}
+export type RegisterResult = RegisterWorkerResult;
 
 export class AuthService {
   constructor(
@@ -27,16 +29,18 @@ export class AuthService {
     private workersService = new WorkersService(),
   ) {}
 
-  async login(phone: string, password: string): Promise<LoginResult> {
-    const user = await this.usersService.findByPhone(phone);
+  async login(input: LoginBody): Promise<LoginResult> {
+    const user = await this.resolveUserForLogin(input);
     if (!user) {
-      throw new UnauthorizedError("Invalid phone or password");
+      throw new UnauthorizedError("Invalid credentials");
     }
 
-    const valid = await verifyPassword(password, user.passwordHash);
+    const valid = await verifyPassword(input.password, user.passwordHash);
     if (!valid) {
-      throw new UnauthorizedError("Invalid phone or password");
+      throw new UnauthorizedError("Invalid credentials");
     }
+
+    await this.assertWorkerMayLogin(user);
 
     const token = signToken({
       userId: user.systemId,
@@ -48,15 +52,36 @@ export class AuthService {
   }
 
   async register(body: RegisterBody): Promise<RegisterResult> {
-    const result = await this.workersService.registerWorker(body);
-    const token = signToken({
-      userId: result.user.systemId,
-      role: "worker",
-    });
-    return { token, ...result };
+    return this.workersService.registerWorker(body);
   }
 
   async getMe(userId: string): Promise<PublicUser> {
     return this.usersService.getPublicProfile(userId);
+  }
+
+  private async resolveUserForLogin(
+    input: Pick<LoginBody, "phone" | "systemId">,
+  ): Promise<User | null> {
+    if (input.phone) {
+      return this.usersService.findByPhone(input.phone);
+    }
+    if (input.systemId) {
+      return this.usersService.findBySystemId(input.systemId);
+    }
+    return null;
+  }
+
+  private async assertWorkerMayLogin(user: User): Promise<void> {
+    if (user.role !== "worker") {
+      return;
+    }
+
+    const worker = await this.workersService.findById(user.systemId);
+    if (worker.status === "pending") {
+      throw new ForbiddenError("Account pending admin approval");
+    }
+    if (worker.status === "rejected") {
+      throw new ForbiddenError("Account has been rejected");
+    }
   }
 }

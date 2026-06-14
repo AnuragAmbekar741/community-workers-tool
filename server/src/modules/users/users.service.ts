@@ -50,6 +50,10 @@ export class UsersService {
     return this.repo.findByPhone(phone);
   }
 
+  async findBySystemId(systemId: string): Promise<User | null> {
+    return this.repo.findById(systemId);
+  }
+
   async getPublicProfile(systemId: string): Promise<PublicUser> {
     return this.findById(systemId);
   }

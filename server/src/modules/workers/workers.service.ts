@@ -1,4 +1,4 @@
-import type { Gender, Role } from "../../constants/index.js";
+import type { Gender, Role, WorkerStatus } from "../../constants/index.js";
 import type { Worker } from "../../db/schema/workers.js";
 import {
   ConflictError,
@@ -16,6 +16,11 @@ import type { RegisterWorkerBody } from "./workers.schema.js";
 export type WorkerProfile = Worker;
 
 export interface RegisterWorkerResult {
+  user: PublicUser;
+  worker: WorkerProfile;
+}
+
+export interface AdminWorkerListItem {
   user: PublicUser;
   worker: WorkerProfile;
 }
@@ -148,6 +153,18 @@ export class WorkersService {
   async listAllWorkerIds(): Promise<{ workers: string[] }> {
     const workers = await this.workersRepo.listAllIds();
     return { workers };
+  }
+
+  async listWorkersForAdmin(
+    status?: WorkerStatus,
+  ): Promise<{ workers: AdminWorkerListItem[] }> {
+    const rows = await this.workersRepo.listAllWithUsers(status);
+    return {
+      workers: rows.map(({ user, worker }) => ({
+        user: toPublicUser(user),
+        worker,
+      })),
+    };
   }
 
   async listSupervisorWorkerIds(

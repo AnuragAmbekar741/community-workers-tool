@@ -10,13 +10,15 @@ import type {
   ApproveWorkerParams,
   AssignWorkerBody,
   AssignWorkerParams,
+  ListWorkersQuery,
 } from "./admin.schema.js";
 
 const workersService = new WorkersService();
 const sessionsService = new SessionsService();
 
-export async function listWorkers(_req: Request, res: Response) {
-  const result = await workersService.listAllWorkerIds();
+export async function listWorkers(req: Request, res: Response) {
+  const { status } = req.query as ListWorkersQuery;
+  const result = await workersService.listWorkersForAdmin(status);
   res.status(200).json(result);
 }
 

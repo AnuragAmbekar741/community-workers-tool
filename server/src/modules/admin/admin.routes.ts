@@ -13,11 +13,15 @@ import {
   listWorkers,
   updateSession,
 } from "./admin.controller.js";
-import { approveWorkerSchema, assignWorkerSchema } from "./admin.schema.js";
+import { approveWorkerSchema, assignWorkerSchema, listWorkersQuerySchema } from "./admin.schema.js";
 
 export const adminRouter = Router();
 
-adminRouter.get("/workers", asyncHandler(listWorkers));
+adminRouter.get(
+  "/workers",
+  validate(listWorkersQuerySchema),
+  asyncHandler(listWorkers),
+);
 adminRouter.patch(
   "/workers/:id/approve",
   validate(approveWorkerSchema),

@@ -84,6 +84,21 @@ export class WorkersRepository {
     return rows.map((row) => row.systemId);
   }
 
+  async listAllWithUsers(
+    status?: WorkerStatus,
+  ): Promise<Array<{ user: User; worker: Worker }>> {
+    const conditions = status ? eq(workers.status, status) : undefined;
+
+    const rows = await db
+      .select({ user: users, worker: workers })
+      .from(workers)
+      .innerJoin(users, eq(workers.systemId, users.systemId))
+      .where(conditions)
+      .orderBy(desc(users.createdAt));
+
+    return rows;
+  }
+
   async listIdsBySupervisor(supervisorId: string): Promise<string[]> {
     const rows = await db
       .select({ systemId: workers.systemId })

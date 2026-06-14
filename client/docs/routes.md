@@ -17,8 +17,13 @@ URL map, auth guards, and feature folder mapping for the client app. Implement w
 | `/worker/sessions` | Session list | JWT | `worker` |
 | `/worker/sessions/new` | New session | JWT | `worker` + approved |
 | `/worker/sessions/:id` | Session detail | JWT | `worker` + own session |
-| `/supervisor` | Supervisor dashboard | JWT | `supervisor` (TBD) |
-| `/admin` | Admin dashboard | JWT | `admin` (TBD) |
+| `/supervisor` | Supervisor overview | JWT | `supervisor` |
+| `/supervisor/workers` | Assigned workers | JWT | `supervisor` |
+| `/supervisor/sessions` | Worker sessions | JWT | `supervisor` |
+| `/supervisor/analytics` | Analytics | JWT | `supervisor` |
+| `/admin` | Admin overview | JWT | `admin` |
+| `/admin/workers` | Worker approval | JWT | `admin` |
+| `/admin/sessions` | All sessions (stub) | JWT | `admin` |
 
 ---
 
@@ -58,8 +63,8 @@ URL map, auth guards, and feature folder mapping for the client app. Implement w
 | Role | Default route |
 | --- | --- |
 | `worker` | `/worker` |
-| `supervisor` | `/supervisor` (TBD) |
-| `admin` | `/admin` (TBD) |
+| `supervisor` | `/supervisor` |
+| `admin` | `/admin` |
 
 ---
 
@@ -74,6 +79,10 @@ Per [FE-GUIDELINES](../FE-GUIDELINES.md), map routes to `src/features/`:
 | `/login` | `src/features/auth-login/` |
 | `/worker` | `src/features/worker-home/` |
 | `/worker/sessions`, `/worker/sessions/new`, `/worker/sessions/:id` | `src/features/worker-sessions/` |
+| `/supervisor`, `/supervisor/workers`, `/supervisor/sessions`, `/supervisor/analytics` | `src/features/dashboard/pages/supervisor/` |
+| `/admin`, `/admin/workers`, `/admin/sessions` | `src/features/dashboard/pages/admin/` |
+
+Shared dashboard shell (sidebar, header, nav): `src/features/dashboard/layout/`
 
 Shared infrastructure (not feature folders):
 

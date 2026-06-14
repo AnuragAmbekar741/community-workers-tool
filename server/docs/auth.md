@@ -8,13 +8,36 @@ Authoritative contract for browser and API auth in the Community Worker M&E Tool
 
 ## Model
 
-- Users log in with **phone + password** (all roles).
+- Users log in with **phone or system_id** plus **password** (all roles). Provide exactly one identifier in the request body.
+- Workers **cannot** log in until an admin has approved their account (`workers.status = approved`).
+- Registration does **not** authenticate the user — no JWT is issued on register.
 - Server signs a **JWT** and stores it in an **HttpOnly cookie** — the browser sends it automatically on each request.
 - **No refresh token** — when the JWT expires, the user logs in again.
 - **Browser clients** must not receive the JWT in JSON response bodies.
 - **API tooling** (Postman, scripts) may use `Authorization: Bearer <token>` as a secondary path in `requireAuth`.
 
 The frontend never reads, stores, or manually attaches the JWT. Auth state is inferred via `GET /me` (200 = logged in, 401 = not).
+
+---
+
+## Login request body
+
+Provide **exactly one** of `phone` or `systemId`, plus `password`:
+
+```json
+{ "phone": "+267...", "password": "..." }
+```
+
+```json
+{ "systemId": "CW0001", "password": "..." }
+```
+
+| Case | Status | Message |
+| --- | --- | --- |
+| Bad credentials | 401 | `Invalid credentials` |
+| Worker pending approval | 403 | `Account pending admin approval` |
+| Worker rejected | 403 | `Account has been rejected` |
+| Both or neither identifier | 400 | Zod validation error |
 
 ---
 
@@ -36,7 +59,7 @@ The frontend never reads, stores, or manually attaches the JWT. Auth state is in
 | Method | Path | Access | Cookie behavior | Response body |
 | --- | --- | --- | --- | --- |
 | POST | `/auth/login` | Public | **Set** auth cookie | `{ user }` — no `token` |
-| POST | `/auth/register` | Public | **Set** auth cookie | `{ user, worker }` — no `token` |
+| POST | `/auth/register` | Public | No cookie (pending worker) | `{ user, worker }` — no `token` |
 | POST | `/auth/logout` | Public | **Clear** auth cookie (`Max-Age=0`) | `{ success: true }` or `204` |
 | GET | `/me` | Authenticated | Read JWT from cookie | `{ user }` or user profile shape |
 
@@ -52,7 +75,7 @@ sequenceDiagram
   participant SPA as Vite_SPA
   participant API as Express_API
 
-  SPA->>API: POST /auth/login phone password
+  SPA->>API: POST /auth/login phone or systemId password
   API->>Browser: Set-Cookie HttpOnly JWT
   API->>SPA: 200 user JSON no token
   SPA->>API: GET /me withCredentials true
