@@ -2,34 +2,17 @@ import type { ColumnDef } from "@tanstack/react-table";
 
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { getDataTableRowSelectColumn } from "@/components/data-table/data-table-row-select-column";
-import { TOPIC_OPTIONS, VILLAGE_OPTIONS } from "@/lib/constants";
+import { VILLAGE_OPTIONS } from "@/lib/constants";
 import { getOptionLabel } from "@/lib/option-label";
+import {
+  formatSessionDate,
+  formatSessionTopic,
+} from "@/lib/session-format";
 import type { SessionDto } from "@/types/session";
 
 type GetSessionsColumnsOptions = {
   enableSelection: boolean;
 };
-
-function formatSessionDate(date: string): string {
-  const [year, month, day] = date.split("-").map(Number);
-  if (!year || !month || !day) {
-    return date;
-  }
-
-  return new Date(year, month - 1, day).toLocaleDateString(undefined, {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
-
-function formatTopic(session: SessionDto): string {
-  if (session.topic === "other" && session.topicOther?.trim()) {
-    return session.topicOther.trim();
-  }
-
-  return getOptionLabel(TOPIC_OPTIONS, session.topic);
-}
 
 export function getSessionsColumns({
   enableSelection,
@@ -78,12 +61,14 @@ export function getSessionsColumns({
     },
     {
       id: "topic",
-      accessorFn: (row) => formatTopic(row),
+      accessorFn: (row) => formatSessionTopic(row),
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Topic" />
       ),
       cell: ({ row }) => (
-        <span className="whitespace-normal">{formatTopic(row.original)}</span>
+        <span className="whitespace-normal">
+          {formatSessionTopic(row.original)}
+        </span>
       ),
     },
     {

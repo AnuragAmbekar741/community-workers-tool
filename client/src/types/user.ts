@@ -1,3 +1,5 @@
+import type { WorkerDto } from "./auth";
+
 export type Role = "worker" | "supervisor" | "admin";
 
 export type UserDto = {
@@ -10,3 +12,7 @@ export type UserDto = {
   role: Role;
   createdAt: string;
 };
+
+export type WorkerMeResponse = UserDto & { worker: WorkerDto };
+
+export type MeResponse = UserDto | WorkerMeResponse;

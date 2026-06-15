@@ -13,6 +13,7 @@ import {
 import {
   WorkersService,
   type RegisterWorkerResult,
+  type WorkerProfile,
 } from "../workers/workers.service.js";
 import type { LoginBody, RegisterBody } from "./auth.schema.js";
 
@@ -22,6 +23,8 @@ export interface LoginResult {
 }
 
 export type RegisterResult = RegisterWorkerResult;
+
+export type MeResponse = PublicUser | (PublicUser & { worker: WorkerProfile });
 
 export class AuthService {
   constructor(
@@ -55,8 +58,14 @@ export class AuthService {
     return this.workersService.registerWorker(body);
   }
 
-  async getMe(userId: string): Promise<PublicUser> {
-    return this.usersService.getPublicProfile(userId);
+  async getMe(userId: string): Promise<MeResponse> {
+    const user = await this.usersService.getPublicProfile(userId);
+    if (user.role !== "worker") {
+      return user;
+    }
+
+    const worker = await this.workersService.findById(userId);
+    return { ...user, worker };
   }
 
   private async resolveUserForLogin(

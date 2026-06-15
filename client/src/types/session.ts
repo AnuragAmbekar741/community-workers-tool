@@ -1,5 +1,20 @@
 import type { Topic, Village } from "@/lib/constants";
 
+export type CreateSessionRequest = {
+  sessionDate: string;
+  village: Village;
+  topic: Topic;
+  topicOther?: string;
+  durationMin: number;
+  nWomen: number;
+  nMen: number;
+  nGirls: number;
+  nBoys: number;
+  nElders: number;
+  nOthers: number;
+  keyIssues?: string;
+};
+
 export type SessionDto = {
   sessionId: string;
   workerId: string;
@@ -21,6 +36,14 @@ export type SessionDto = {
 
 export type ListSessionsResponse = {
   sessions: SessionDto[];
+};
+
+export type GetSessionResponse = {
+  session: SessionDto;
+};
+
+export type CreateSessionResponse = {
+  session: SessionDto;
 };
 
 export type SessionVillageFilter = Village | "all";

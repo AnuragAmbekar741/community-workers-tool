@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Outlet } from "react-router-dom";
 
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DashboardLayout } from "@/features/dashboard/layout/DashboardLayout";
@@ -13,7 +13,12 @@ import { AuthLoginStubPage } from "@/features/auth-login/AuthLoginStubPage";
 import { RegisterPage } from "@/features/auth-register/RegisterPage";
 import { LandingPage } from "@/features/landing/LandingPage";
 import { NotFoundPage } from "@/features/not-found/NotFoundPage";
-import { WorkerHomeStubPage } from "@/features/worker-home/WorkerHomeStubPage";
+import { ApprovedWorkerGuard } from "@/features/worker/components/ApprovedWorkerGuard";
+import { WorkerHomePage } from "@/features/worker-home/WorkerHomePage";
+import { WorkerProfilePage } from "@/features/worker-profile/WorkerProfilePage";
+import { NewSessionPage } from "@/features/worker-sessions/NewSessionPage";
+import { SessionDetailPage } from "@/features/worker-sessions/SessionDetailPage";
+import { WorkerSessionsPage } from "@/features/worker-sessions/WorkerSessionsPage";
 import { RootLayout } from "@/layouts/RootLayout";
 
 export const router = createBrowserRouter([
@@ -28,9 +33,23 @@ export const router = createBrowserRouter([
         path: "worker",
         element: (
           <ProtectedRoute role="worker">
-            <WorkerHomeStubPage />
+            <Outlet />
           </ProtectedRoute>
         ),
+        children: [
+          { index: true, element: <WorkerHomePage /> },
+          { path: "profile", element: <WorkerProfilePage /> },
+          { path: "sessions", element: <WorkerSessionsPage /> },
+          {
+            path: "sessions/new",
+            element: (
+              <ApprovedWorkerGuard>
+                <NewSessionPage />
+              </ApprovedWorkerGuard>
+            ),
+          },
+          { path: "sessions/:id", element: <SessionDetailPage /> },
+        ],
       },
       {
         path: "supervisor",
