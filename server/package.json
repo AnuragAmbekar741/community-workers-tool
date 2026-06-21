@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "start": "NODE_ENV=production tsx src/index.ts",
     "dev": "NODE_ENV=development tsx watch src/index.ts",
     "typecheck": "tsc --noEmit",
     "db:up": "docker compose up -d",
