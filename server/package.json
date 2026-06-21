@@ -17,6 +17,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": ">=22"
+  },
   "type": "module",
   "dependencies": {
     "bcrypt": "^6.0.0",
