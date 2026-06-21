@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
 import { useMe } from "@/hooks/use-me";
-import { isApiError } from "@/lib/api-error";
 import { getRoleHomePath } from "@/lib/auth-routes";
 import type { Role } from "@/types/user";
 
@@ -13,7 +12,7 @@ type ProtectedRouteProps = {
 
 export function ProtectedRoute({ role, children }: ProtectedRouteProps) {
   const location = useLocation();
-  const { data: user, isLoading, isError, error } = useMe();
+  const { data: user, isLoading } = useMe();
 
   if (isLoading) {
     return (
@@ -23,8 +22,7 @@ export function ProtectedRoute({ role, children }: ProtectedRouteProps) {
     );
   }
 
-  const isUnauthorized =
-    !user || (isError && isApiError(error) && error.status === 401);
+  const isUnauthorized = !user;
 
   if (isUnauthorized) {
     const redirect = `${location.pathname}${location.search}`;

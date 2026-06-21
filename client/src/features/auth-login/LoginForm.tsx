@@ -50,11 +50,11 @@ export function LoginForm() {
     setRootError(null);
 
     try {
-      const result = await loginMutation.mutateAsync(toLoginRequest(values));
+      const me = await loginMutation.mutateAsync(toLoginRequest(values));
       const destination =
         redirectTo && redirectTo.startsWith("/")
           ? redirectTo
-          : getRoleHomePath(result.user.role);
+          : getRoleHomePath(me.role);
       navigate(destination, { replace: true });
     } catch (error) {
       if (isApiError(error)) {
