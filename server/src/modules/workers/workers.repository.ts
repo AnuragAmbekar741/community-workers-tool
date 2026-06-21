@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { db, type Db } from "../../db/index.js";
 import {
   users,
@@ -10,7 +10,7 @@ import {
   type NewWorker,
   type Worker,
 } from "../../db/schema/workers.js";
-import type { WorkerStatus } from "../../constants/index.js";
+import type { Organisation, WorkerStatus } from "../../constants/index.js";
 
 type DbOrTx = Db | Parameters<Parameters<Db["transaction"]>[0]>[0];
 
@@ -106,6 +106,34 @@ export class WorkersRepository {
       .where(eq(workers.supervisorId, supervisorId))
       .orderBy(workers.systemId);
     return rows.map((row) => row.systemId);
+  }
+
+  async listIdsByOrganisation(organisation: Organisation): Promise<string[]> {
+    const rows = await db
+      .select({ systemId: workers.systemId })
+      .from(workers)
+      .innerJoin(users, eq(workers.systemId, users.systemId))
+      .where(eq(users.organisation, organisation))
+      .orderBy(workers.systemId);
+    return rows.map((row) => row.systemId);
+  }
+
+  async listWithUsersByOrganisation(
+    organisation: Organisation,
+    status?: WorkerStatus,
+  ): Promise<Array<{ user: User; worker: Worker }>> {
+    const conditions = status
+      ? and(eq(users.organisation, organisation), eq(workers.status, status))
+      : eq(users.organisation, organisation);
+
+    const rows = await db
+      .select({ user: users, worker: workers })
+      .from(workers)
+      .innerJoin(users, eq(workers.systemId, users.systemId))
+      .where(conditions)
+      .orderBy(desc(users.createdAt));
+
+    return rows;
   }
 
   async registerWorkerPair(

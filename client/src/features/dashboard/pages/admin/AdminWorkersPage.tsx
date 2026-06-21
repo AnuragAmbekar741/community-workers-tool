@@ -2,11 +2,12 @@ import { useState } from "react";
 import type { RowSelectionState } from "@tanstack/react-table";
 
 import { DataTablePage } from "@/components/data-table/data-table-page";
+import { WorkersDataTable } from "@/features/dashboard/components/WorkersDataTable";
 import { useAdminWorkers } from "@/hooks/use-admin-workers";
 import { isApiError } from "@/lib/api-error";
 import type { WorkerStatusFilter } from "@/types/admin";
 
-import { WorkersDataTable } from "./components/WorkersDataTable";
+import { AdminWorkerStatusSelect } from "./components/AdminWorkerStatusSelect";
 
 const EMPTY_MESSAGES: Record<WorkerStatusFilter | "all", string> = {
   pending: "No pending workers.",
@@ -69,6 +70,7 @@ export function AdminWorkersPage() {
         onSearchQueryChange={setSearchQuery}
         rowSelection={rowSelection}
         onRowSelectionChange={setRowSelection}
+        StatusCell={AdminWorkerStatusSelect}
       />
     </DataTablePage>
   );

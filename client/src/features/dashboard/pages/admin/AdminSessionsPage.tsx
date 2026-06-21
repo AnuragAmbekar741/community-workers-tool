@@ -2,13 +2,12 @@ import { useMemo, useState } from "react";
 import type { RowSelectionState } from "@tanstack/react-table";
 
 import { DataTablePage } from "@/components/data-table/data-table-page";
+import { SessionsDataTable } from "@/features/dashboard/components/SessionsDataTable";
 import { useAdminSessions } from "@/hooks/use-admin-sessions";
 import { VILLAGE_OPTIONS } from "@/lib/constants";
 import { isApiError } from "@/lib/api-error";
 import { getOptionLabel } from "@/lib/option-label";
 import type { SessionVillageFilter } from "@/types/session";
-
-import { SessionsDataTable } from "./components/SessionsDataTable";
 
 export function AdminSessionsPage() {
   const [villageFilter, setVillageFilter] = useState<SessionVillageFilter>("all");

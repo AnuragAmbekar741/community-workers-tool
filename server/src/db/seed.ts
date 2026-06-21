@@ -4,6 +4,44 @@ import { UsersService } from "../modules/users/users.service.js";
 
 const ADMIN_SYSTEM_ID = "ADMIN";
 
+const SUPERVISOR_SEEDS = [
+  {
+    systemId: "SUP01",
+    name: "BONEPWA Supervisor",
+    phone: "70000002",
+    organisation: "BONEPWA" as const,
+  },
+  {
+    systemId: "SUP02",
+    name: "MAHALAYPEE Supervisor",
+    phone: "70000003",
+    organisation: "MAHALAYPEE" as const,
+  },
+];
+
+async function seedUser(
+  usersService: UsersService,
+  input: {
+    systemId: string;
+    name: string;
+    age: number;
+    gender: "prefer_not_to_say";
+    phone: string;
+    organisation: "BONEPWA" | "MAHALAYPEE" | null;
+    role: "admin" | "supervisor";
+    password: string;
+  },
+) {
+  const existing = await usersService.findBySystemId(input.systemId);
+  if (existing) {
+    console.log(`User ${input.systemId} already exists — skipping.`);
+    return;
+  }
+
+  const user = await usersService.createUser(input);
+  console.log(`Seeded ${input.role} user: ${user.systemId} (phone: ${user.phone})`);
+}
+
 async function seed() {
   if (env.NODE_ENV === "production") {
     console.error("db:seed must not run in production.");
@@ -13,13 +51,7 @@ async function seed() {
   const password = process.env.SEED_PASSWORD ?? "password123";
   const usersService = new UsersService();
 
-  const existing = await usersService.findBySystemId(ADMIN_SYSTEM_ID);
-  if (existing) {
-    console.log(`Admin user ${ADMIN_SYSTEM_ID} already exists — skipping.`);
-    return;
-  }
-
-  const admin = await usersService.createUser({
+  await seedUser(usersService, {
     systemId: ADMIN_SYSTEM_ID,
     name: "System Admin",
     age: 35,
@@ -30,8 +62,20 @@ async function seed() {
     password,
   });
 
-  console.log(`Seeded admin user: ${admin.systemId} (phone: ${admin.phone})`);
-  console.log("Login with systemId ADMIN or phone 70000001 and SEED_PASSWORD.");
+  for (const supervisor of SUPERVISOR_SEEDS) {
+    await seedUser(usersService, {
+      systemId: supervisor.systemId,
+      name: supervisor.name,
+      age: 40,
+      gender: "prefer_not_to_say",
+      phone: supervisor.phone,
+      organisation: supervisor.organisation,
+      role: "supervisor",
+      password,
+    });
+  }
+
+  console.log("Login with systemId or phone and SEED_PASSWORD.");
 }
 
 seed()

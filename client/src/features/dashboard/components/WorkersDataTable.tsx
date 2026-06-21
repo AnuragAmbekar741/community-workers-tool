@@ -1,11 +1,15 @@
 import { useMemo } from "react";
+import type { ComponentType } from "react";
 import type { OnChangeFn, RowSelectionState } from "@tanstack/react-table";
 
 import { DataTable } from "@/components/data-table/data-table";
 import type { AdminWorkerListItem, WorkerStatusFilter } from "@/types/admin";
 
 import { WorkersTableToolbar } from "./WorkersTableToolbar";
-import { getWorkersColumns } from "./workers-columns";
+import {
+  getWorkersColumns,
+  type WorkerStatusCellProps,
+} from "./workers-columns";
 
 type WorkersDataTableProps = {
   workers: AdminWorkerListItem[];
@@ -16,6 +20,7 @@ type WorkersDataTableProps = {
   onSearchQueryChange: (value: string) => void;
   rowSelection: RowSelectionState;
   onRowSelectionChange: OnChangeFn<RowSelectionState>;
+  StatusCell: ComponentType<WorkerStatusCellProps>;
 };
 
 export function WorkersDataTable({
@@ -27,10 +32,11 @@ export function WorkersDataTable({
   onSearchQueryChange,
   rowSelection,
   onRowSelectionChange,
+  StatusCell,
 }: WorkersDataTableProps) {
   const columns = useMemo(
-    () => getWorkersColumns({ enableSelection: true }),
-    [],
+    () => getWorkersColumns({ enableSelection: true, StatusCell }),
+    [StatusCell],
   );
 
   const filteredWorkers = useMemo(() => {

@@ -132,16 +132,41 @@ export class SessionsService {
   async listForSupervisor(
     supervisorId: string,
   ): Promise<{ sessions: Session[] }> {
-    const workerIds = await this.getSupervisorWorkerIds(supervisorId);
+    const workerIds = await this.getSupervisorOrgWorkerIds(supervisorId);
     const sessions = await this.sessionsRepo.findByWorkerIds(workerIds);
     return { sessions };
+  }
+
+  async updateForSupervisorOrg(
+    supervisorId: string,
+    sessionId: string,
+    input: UpdateSessionBody,
+  ): Promise<{ session: Session }> {
+    const session = await this.getSessionOrThrow(sessionId);
+    await this.workersService.assertWorkerInSupervisorOrg(
+      supervisorId,
+      session.workerId,
+    );
+    return this.updateAny(sessionId, input);
+  }
+
+  async deleteForSupervisorOrg(
+    supervisorId: string,
+    sessionId: string,
+  ): Promise<void> {
+    const session = await this.getSessionOrThrow(sessionId);
+    await this.workersService.assertWorkerInSupervisorOrg(
+      supervisorId,
+      session.workerId,
+    );
+    await this.sessionsRepo.delete(sessionId);
   }
 
   async getAnalytics(
     supervisorId: string,
     filters: AnalyticsFilters = {},
   ): Promise<SupervisorAnalytics> {
-    const workerIds = await this.getSupervisorWorkerIds(supervisorId);
+    const workerIds = await this.getSupervisorOrgWorkerIds(supervisorId);
     const rows = await this.sessionsRepo.aggregateByWorkerIds(workerIds, filters);
 
     const analytics: SupervisorAnalytics = {
@@ -237,7 +262,7 @@ export class SessionsService {
     }
   }
 
-  private async getSupervisorWorkerIds(supervisorId: string): Promise<string[]> {
+  private async getSupervisorOrgWorkerIds(supervisorId: string): Promise<string[]> {
     const { workers } =
       await this.workersService.listSupervisorWorkerIds(supervisorId);
     return workers;

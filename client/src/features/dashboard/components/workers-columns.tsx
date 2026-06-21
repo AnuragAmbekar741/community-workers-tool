@@ -1,3 +1,4 @@
+import type { ComponentType } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
@@ -11,14 +12,21 @@ import {
 import { getOptionLabel } from "@/lib/option-label";
 import type { AdminWorkerListItem } from "@/types/admin";
 
-import { WorkerStatusSelect } from "./WorkerStatusSelect";
+type WorkerStatus = "pending" | "approved" | "rejected";
+
+export type WorkerStatusCellProps = {
+  workerId: string;
+  status: WorkerStatus;
+};
 
 type GetWorkersColumnsOptions = {
   enableSelection: boolean;
+  StatusCell: ComponentType<WorkerStatusCellProps>;
 };
 
 export function getWorkersColumns({
   enableSelection,
+  StatusCell,
 }: GetWorkersColumnsOptions): ColumnDef<AdminWorkerListItem>[] {
   const columns: ColumnDef<AdminWorkerListItem>[] = [];
 
@@ -90,7 +98,7 @@ export function getWorkersColumns({
         <DataTableColumnHeader column={column} title="Status" />
       ),
       cell: ({ row }) => (
-        <WorkerStatusSelect
+        <StatusCell
           workerId={row.original.worker.systemId}
           status={row.original.worker.status}
         />

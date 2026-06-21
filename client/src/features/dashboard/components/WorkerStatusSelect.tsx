@@ -18,25 +18,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/base/select";
-import { useApproveWorker } from "@/hooks/use-approve-worker";
 import { isApiError } from "@/lib/api-error";
 import { cn } from "@/lib/utils";
 
-type WorkerStatus = "pending" | "approved" | "rejected";
+import type { WorkerStatusCellProps } from "./workers-columns";
 
-type WorkerStatusSelectProps = {
-  workerId: string;
-  status: WorkerStatus;
+type WorkerStatusSelectProps = WorkerStatusCellProps & {
+  onApprove: (args: {
+    workerId: string;
+    approved: boolean;
+  }) => Promise<unknown>;
+  isPending: boolean;
 };
 
-const STATUS_OPTIONS: Array<{ value: WorkerStatus; label: string }> = [
+const STATUS_OPTIONS: Array<{
+  value: WorkerStatusCellProps["status"];
+  label: string;
+}> = [
   { value: "pending", label: "Pending" },
   { value: "approved", label: "Approved" },
   { value: "rejected", label: "Rejected" },
 ];
 
 function statusBadgeVariant(
-  status: WorkerStatus,
+  status: WorkerStatusCellProps["status"],
 ): "pending" | "approved" | "rejected" {
   return status;
 }
@@ -44,15 +49,16 @@ function statusBadgeVariant(
 export function WorkerStatusSelect({
   workerId,
   status,
+  onApprove,
+  isPending,
 }: WorkerStatusSelectProps) {
-  const approveMutation = useApproveWorker();
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
 
-  async function updateStatus(nextStatus: WorkerStatus) {
+  async function updateStatus(nextStatus: WorkerStatusCellProps["status"]) {
     setRejectDialogOpen(false);
 
     try {
-      await approveMutation.mutateAsync({
+      await onApprove({
         workerId,
         approved: nextStatus === "approved",
       });
@@ -66,7 +72,7 @@ export function WorkerStatusSelect({
     }
   }
 
-  function handleStatusChange(nextStatus: WorkerStatus) {
+  function handleStatusChange(nextStatus: WorkerStatusCellProps["status"]) {
     if (nextStatus === status || nextStatus === "pending") {
       return;
     }
@@ -83,8 +89,10 @@ export function WorkerStatusSelect({
     <>
       <Select
         value={status}
-        onValueChange={(value) => handleStatusChange(value as WorkerStatus)}
-        disabled={approveMutation.isPending}
+        onValueChange={(value) =>
+          handleStatusChange(value as WorkerStatusCellProps["status"])
+        }
+        disabled={isPending}
       >
         <SelectTrigger
           size="sm"
@@ -120,14 +128,14 @@ export function WorkerStatusSelect({
             <Button
               variant="outline"
               onClick={() => setRejectDialogOpen(false)}
-              disabled={approveMutation.isPending}
+              disabled={isPending}
             >
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={() => void updateStatus("rejected")}
-              disabled={approveMutation.isPending}
+              disabled={isPending}
             >
               Reject
             </Button>

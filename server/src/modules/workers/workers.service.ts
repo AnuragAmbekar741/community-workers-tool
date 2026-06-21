@@ -1,4 +1,9 @@
-import type { Gender, Role, WorkerStatus } from "../../constants/index.js";
+import type {
+  Gender,
+  Organisation,
+  Role,
+  WorkerStatus,
+} from "../../constants/index.js";
 import type { Worker } from "../../db/schema/workers.js";
 import {
   ConflictError,
@@ -170,8 +175,77 @@ export class WorkersService {
   async listSupervisorWorkerIds(
     supervisorId: string,
   ): Promise<{ workers: string[] }> {
-    const workers = await this.workersRepo.listIdsBySupervisor(supervisorId);
+    const organisation = await this.getSupervisorOrganisation(supervisorId);
+    const workers = await this.workersRepo.listIdsByOrganisation(organisation);
     return { workers };
+  }
+
+  async listWorkersForSupervisor(
+    supervisorId: string,
+    status?: WorkerStatus,
+  ): Promise<{ workers: AdminWorkerListItem[] }> {
+    const organisation = await this.getSupervisorOrganisation(supervisorId);
+    const rows = await this.workersRepo.listWithUsersByOrganisation(
+      organisation,
+      status,
+    );
+    return {
+      workers: rows.map(({ user, worker }) => ({
+        user: toPublicUser(user),
+        worker,
+      })),
+    };
+  }
+
+  async approveWorkerForSupervisor(
+    supervisorId: string,
+    workerId: string,
+    approved: boolean,
+  ): Promise<WorkerProfile> {
+    await this.assertWorkerInSupervisorOrg(supervisorId, workerId);
+    const worker = await this.approveWorker(workerId, approved);
+
+    if (approved && worker.supervisorId !== supervisorId) {
+      return this.workersRepo.assignSupervisor(workerId, supervisorId);
+    }
+
+    return worker;
+  }
+
+  async assertWorkerInSupervisorOrg(
+    supervisorId: string,
+    workerId: string,
+  ): Promise<WorkerProfile> {
+    const organisation = await this.getSupervisorOrganisation(supervisorId);
+    const workerUser = await this.usersRepo.findById(workerId);
+    if (!workerUser) {
+      throw new NotFoundError("Worker user not found");
+    }
+
+    if (workerUser.organisation !== organisation) {
+      throw new ForbiddenError("Worker is not in your organisation");
+    }
+
+    return this.findById(workerId);
+  }
+
+  private async getSupervisorOrganisation(
+    supervisorId: string,
+  ): Promise<Organisation> {
+    const supervisor = await this.usersRepo.findById(supervisorId);
+    if (!supervisor) {
+      throw new NotFoundError("Supervisor not found");
+    }
+
+    if (supervisor.role !== "supervisor") {
+      throw new ForbiddenError("User is not a supervisor");
+    }
+
+    if (!supervisor.organisation) {
+      throw new ValidationError("Supervisor has no organisation");
+    }
+
+    return supervisor.organisation as Organisation;
   }
 
   async assertApproved(workerId: string): Promise<WorkerProfile> {
