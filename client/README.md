@@ -23,6 +23,6 @@ Auth uses **Bearer JWT** in `localStorage` — see [../server/docs/auth.md](../s
 
 **Local dev:** `.env.development` sets `VITE_API_BASE_URL=/api`. Vite proxies `/api` to `http://localhost:3000`. Start the server on port 3000 before using auth.
 
-**Production (Amplify + Render):** Set Amplify build env `VITE_API_BASE_URL=https://<your-render-service>.onrender.com/api` and rebuild. On Render, set `CORS_ORIGINS` to your exact Amplify URL(s) (comma-separated, no trailing slash).
+**Production (Amplify + Render):** Set Amplify build env `VITE_API_BASE_URL=https://<your-render-service>.onrender.com/api` and rebuild. On Render, set `CORS_ORIGINS` to your exact Amplify URL(s) plus `http://localhost:5173` for local dev, e.g. `https://main.d3etc7e2rs3g8x.amplifyapp.com,http://localhost:5173` (comma-separated, no trailing slash).
 
 See [../server/docs/dissertation-tool-api.postman_collection.json](../server/docs/dissertation-tool-api.postman_collection.json) for endpoint reference.

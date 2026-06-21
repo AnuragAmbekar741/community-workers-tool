@@ -16,7 +16,13 @@ export function createApp() {
   app.set("trust proxy", 1);
 
   app.use(helmet());
-  app.use(cors({ origin: env.CORS_ORIGINS }));
+  app.use(
+    cors({
+      origin: env.CORS_ORIGINS,
+      allowedHeaders: ["Content-Type", "Authorization"],
+      methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
+    }),
+  );
   app.use(compression());
   app.use(express.json({ limit: "1mb" }));
   app.use(express.urlencoded({ extended: true }));
