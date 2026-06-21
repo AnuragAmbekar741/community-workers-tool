@@ -31,6 +31,7 @@ export type LoginRequest =
 
 export type LoginResponse = {
   user: UserDto;
+  token: string;
 };
 
 export type RegisterRequest = {

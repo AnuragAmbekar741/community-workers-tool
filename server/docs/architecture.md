@@ -4,7 +4,7 @@ Source-of-truth overview for `@server/`. Describes the codebase **as it exists t
 
 **Related docs:**
 
-- [auth.md](./auth.md) — HttpOnly cookie JWT auth contract and BE implementation checklist
+- [auth.md](./auth.md) — Bearer JWT auth contract
 - [backend_rules.md](./backend_rules.md) — where code goes, error/logging/validation conventions
 - [step-by-step.md](./step-by-step.md) — incremental build guide
 - [../../server-setup.md](../../server-setup.md) — full blueprint and ADRs
@@ -29,7 +29,7 @@ Key design choices:
 | **Fail-fast config** | Zod validates env at boot; bad deploy never serves traffic |
 | **Centralized errors** | All errors flow through `next(err)` → `errorHandler` |
 | **Structured logging** | Pino + pino-http; no ad-hoc `console.log` in `src/` |
-| **HttpOnly cookie auth** | JWT in cookie for browsers; `requireAuth` reads cookie (Bearer fallback for tooling) — see [auth.md](./auth.md) |
+| **Bearer JWT auth** | Login returns `{ user, token }`; `requireAuth` reads `Authorization: Bearer` — see [auth.md](./auth.md) |
 
 ---
 
@@ -37,19 +37,18 @@ Key design choices:
 
 ```mermaid
 sequenceDiagram
-  participant Browser
   participant SPA as Vite_SPA
+  participant LS as localStorage
   participant API as Express_API
 
   SPA->>API: POST /auth/login
-  API->>Browser: Set-Cookie HttpOnly JWT
-  API->>SPA: user JSON no token
-  SPA->>API: GET /me credentials include
-  Browser->>API: Cookie sent automatically
+  API->>SPA: user plus token JSON
+  SPA->>LS: save token
+  SPA->>API: GET /me Authorization Bearer
   API->>SPA: user profile
 ```
 
-Browser clients use `withCredentials: true` and never store the JWT in JavaScript. Postman/scripts may use `Authorization: Bearer`.
+Browser clients store the JWT in `localStorage` and attach `Authorization: Bearer`. Postman/scripts use the same header with `token` from login JSON.
 
 ---
 
@@ -58,8 +57,7 @@ Browser clients use `withCredentials: true` and never store the JWT in JavaScrip
 ### Runtime
 
 - **express** — HTTP server and routing
-- **cookie-parser** — parse `Cookie` header for HttpOnly JWT auth (see [auth.md](./auth.md))
-- **cors** — cross-origin requests (`credentials: true`; origins from `CORS_ORIGINS` env)
+- **cors** — cross-origin requests (origins from `CORS_ORIGINS` env)
 - **helmet** — security headers
 - **compression** — gzip response bodies
 - **express-rate-limit** — abuse protection (stricter in production)

@@ -45,7 +45,7 @@ Three roles, enforced **server-side**. Every request carries a JWT with `{ userI
 
 **Middleware:** `requireAuth` (valid JWT) → `requireRole(...)` → ownership check (worker only own sessions; supervisor only workers where `supervisor_id = self`).
 
-**Auth model:** login is **phone or system_id** plus **password** for everyone. JWT in an **HttpOnly cookie** (set by server on login only; cleared on logout) — no token in browser JSON, no PIN, no refresh token. Cookie expiry → log in again. See [auth.md](./auth.md).
+**Auth model:** login is **phone or system_id** plus **password** for everyone. Server returns a **JWT** in the login JSON (`{ user, token }`); the SPA stores it in **localStorage** and sends `Authorization: Bearer`. No refresh token — re-login when token expires. See [auth.md](./auth.md).
 
 ---
 
@@ -109,9 +109,9 @@ SEEDED                         WORKER SELF-SERVE FLOW
 
 | Method | Path             | Access | Purpose                                     |
 | ------ | ---------------- | ------ | ------------------------------------------- |
-| POST   | `/auth/register` | 🔓     | **Worker-only** self-registration → pending (no auth cookie) |
-| POST   | `/auth/login`    | 🔓     | Login (all roles), phone or system_id + password → HttpOnly cookie |
-| POST   | `/auth/logout`   | 🔓     | Clear auth cookie                           |
+| POST   | `/auth/register` | 🔓     | **Worker-only** self-registration → pending (no token) |
+| POST   | `/auth/login`    | 🔓     | Login (all roles) → `{ user, token }` |
+| POST   | `/auth/logout`   | 🔓     | Client-side token clear; server returns `{ success: true }` |
 | GET    | `/me`            | 👤🧑‍🏫🛡️ | Current user's own profile                  |
 
 ### Worker — sessions

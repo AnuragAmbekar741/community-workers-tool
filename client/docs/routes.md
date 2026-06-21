@@ -47,7 +47,7 @@ URL map, auth guards, and feature folder mapping for the client app. Implement w
 
 ### Token expiry (401)
 
-- Call `POST /auth/logout` to clear HttpOnly cookie (optional if already expired)
+- Clear JWT from localStorage (axios 401 interceptor also clears on expired token)
 - Invalidate React Query `me` cache
 - Redirect to `/login`
 

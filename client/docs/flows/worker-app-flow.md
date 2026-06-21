@@ -338,7 +338,7 @@ Worker screens follow [FE-GUIDELINES mobile rules](../../FE-GUIDELINES.md):
 **Token expiry**
 
 - No refresh token (per PRD)
-- JWT lives in HttpOnly cookie (see [server/docs/auth.md](../../server/docs/auth.md))
+- JWT stored in localStorage; sent as `Authorization: Bearer` (see [server/docs/auth.md](../../server/docs/auth.md))
 - On 401 response: call logout API, invalidate `me` cache, redirect to `/login`
 
 ---

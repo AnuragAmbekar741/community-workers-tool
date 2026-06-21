@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Dissertation Tool API (Phases 0-3)",
-    "description": "Community Worker M&E Tool — backend API.\n\nBase URL: http://localhost:3000/api\n\nAuth: Browser SPA uses HttpOnly cookies (see server/docs/auth.md). Postman can use Authorization Bearer headers with tokens from login responses until cookie-only migration is complete, or enable Postman cookie jar after login.\n\nDefault dev credentials (adjust if your DB differs):\n- Admin: 70000001 / password123\n- Supervisor: 26770000098 / password123\n- Worker: 26770000001 / password123\n\nRun Auth → Login (Admin/Supervisor/Worker) first to populate tokens.",
+    "description": "Community Worker M&E Tool — backend API.\n\nBase URL: http://localhost:3000/api\n\nAuth: POST /auth/login returns `{ user, token }`. Use `Authorization: Bearer {{token}}` on protected routes. Login requests auto-save tokens to collection variables.\n\nDefault dev credentials (adjust if your DB differs):\n- Admin: 70000001 / password123\n- Supervisor: 26770000098 / password123\n- Worker: 26770000001 / password123\n\nRun Auth → Login (Admin/Supervisor/Worker) first to populate tokens.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -48,7 +48,6 @@
                 "exec": [
                   "if (pm.response.code === 201) {",
                   "  const json = pm.response.json();",
-                  "  pm.collectionVariables.set('workerToken', json.token);",
                   "  if (json.user?.systemId) pm.collectionVariables.set('workerId', json.user.systemId);",
                   "}"
                 ],

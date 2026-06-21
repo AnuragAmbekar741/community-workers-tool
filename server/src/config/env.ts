@@ -22,12 +22,6 @@ const baseSchema = z.object({
   JWT_SECRET: z.string().min(32),
   JWT_EXPIRES_IN: z.string().min(1).default("7d"),
   BCRYPT_ROUNDS: z.coerce.number().int().min(10).max(15).default(12),
-  AUTH_COOKIE_NAME: z.string().min(1).default("auth_token"),
-  COOKIE_SECURE: z
-    .enum(["true", "false"])
-    .default(nodeEnv === "production" ? "true" : "false")
-    .transform((value) => value === "true"),
-  COOKIE_SAME_SITE: z.enum(["lax", "strict", "none"]).default("lax"),
 });
 
 const schema = baseSchema.superRefine((data, ctx) => {

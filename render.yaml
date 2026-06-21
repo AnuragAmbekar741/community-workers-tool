@@ -15,16 +15,10 @@ services:
         value: production
       - key: LOG_LEVEL
         value: info
-      - key: COOKIE_SECURE
-        value: "true"
-      - key: COOKIE_SAME_SITE
-        value: none
       - key: JWT_EXPIRES_IN
         value: 7d
       - key: BCRYPT_ROUNDS
         value: "12"
-      - key: AUTH_COOKIE_NAME
-        value: auth_token
       - key: DATABASE_URL
         sync: false
       - key: JWT_SECRET

@@ -6,7 +6,7 @@ Source of truth for **where code goes** and **how to write it** in `@client/`. F
 
 - [docs/flows/worker-app-flow.md](./docs/flows/worker-app-flow.md) — worker user journey and screen actions
 - [docs/routes.md](./docs/routes.md) — planned URL map and route guards
-- [../server/docs/auth.md](../server/docs/auth.md) — HttpOnly cookie JWT auth contract
+- [../server/docs/auth.md](../server/docs/auth.md) — Bearer JWT auth contract
 - [../server/docs/backend_rules.md](../server/docs/backend_rules.md) — server conventions and API error shapes
 - [../server/docs/architecture.md](../server/docs/architecture.md) — server folder structure and request lifecycle
 - [../server/docs/dissertation-tool-api.postman_collection.json](../server/docs/dissertation-tool-api.postman_collection.json) — API endpoints and example payloads
@@ -354,28 +354,46 @@ createRoot(document.getElementById("root")!).render(
 );
 ```
 
-### `api/client.ts` — axios instance (HttpOnly cookie auth)
+### `api/client.ts` — axios instance (Bearer JWT auth)
 
-JWT is stored in an **HttpOnly cookie** set by the server. The browser attaches it automatically — do **not** use `localStorage` or `Authorization` headers in the SPA.
+JWT is stored in **localStorage** (`auth_token:v1`) and attached via an axios request interceptor.
 
 ```typescript
 import axios from "axios";
+import { clearAuthToken, getAuthToken } from "@/lib/auth-token";
+import { toApiError } from "@/lib/api-error";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? "/api",
-  withCredentials: true,
   headers: { "Content-Type": "application/json" },
+});
+
+api.interceptors.request.use((config) => {
+  const token = getAuthToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 api.interceptors.response.use(
   (res) => res,
-  (error) => Promise.reject(error),
+  (error) => {
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      const url = error.config?.url ?? "";
+      if (!url.endsWith("/auth/login")) {
+        clearAuthToken();
+      }
+    }
+    return Promise.reject(toApiError(error));
+  },
 );
 ```
 
-- Dev: Vite proxies `/api` → `http://localhost:3000` so cookies are same-origin
+- Dev: Vite proxies `/api` → `http://localhost:3000`
+- Production: `VITE_API_BASE_URL` may point directly at Render (cross-origin OK with Bearer)
 - Auth state: `GET /me` via `useMe()` — 200 = logged in, 401 = not
-- Logout: `POST /auth/logout` then invalidate `me` query cache
+- Logout: clear token from localStorage, `POST /auth/logout`, invalidate `me` query cache
 
 See [../server/docs/auth.md](../server/docs/auth.md).
 
@@ -443,7 +461,7 @@ Relevant checklist from Vercel React best practices for this Vite SPA:
 | Barrel imports        | Import from `@/components/base/button`, not `@/components/base` index       |
 | Functional setState   | Use `setItems((curr) => ...)` for stable callbacks in lists/forms           |
 | Lazy state init       | `useState(() => expensiveInit())` for costly initial values                 |
-| Cookie auth           | `withCredentials: true` on axios; never store JWT in JS                      |
+| Bearer auth           | Store JWT in `localStorage`; attach `Authorization` header via axios interceptor |
 | Derive during render  | Compute filtered/sorted lists during render with `useMemo` when expensive   |
 | Event handlers        | Put submit/click logic in handlers, not `useEffect`                         |
 
