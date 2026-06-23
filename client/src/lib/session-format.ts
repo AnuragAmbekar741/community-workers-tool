@@ -1,4 +1,4 @@
-import { TOPIC_OPTIONS, VILLAGE_OPTIONS } from "@/lib/constants";
+import { TOPIC_OPTIONS, DISTRICT_OPTIONS } from "@/lib/constants";
 import { getOptionLabel } from "@/lib/option-label";
 import type { SessionDto } from "@/types/session";
 
@@ -23,6 +23,6 @@ export function formatSessionTopic(session: SessionDto): string {
   return getOptionLabel(TOPIC_OPTIONS, session.topic);
 }
 
-export function formatSessionVillage(session: SessionDto): string {
-  return getOptionLabel(VILLAGE_OPTIONS, session.village);
+export function formatSessionDistrict(session: SessionDto): string {
+  return getOptionLabel(DISTRICT_OPTIONS, session.district);
 }

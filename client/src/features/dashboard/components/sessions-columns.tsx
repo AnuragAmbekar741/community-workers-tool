@@ -2,7 +2,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { getDataTableRowSelectColumn } from "@/components/data-table/data-table-row-select-column";
-import { VILLAGE_OPTIONS } from "@/lib/constants";
+import { DISTRICT_OPTIONS } from "@/lib/constants";
 import { getOptionLabel } from "@/lib/option-label";
 import {
   formatSessionDate,
@@ -51,13 +51,13 @@ export function getSessionsColumns({
       cell: ({ row }) => formatSessionDate(row.original.sessionDate),
     },
     {
-      id: "village",
-      accessorFn: (row) => getOptionLabel(VILLAGE_OPTIONS, row.village),
+      id: "district",
+      accessorFn: (row) => getOptionLabel(DISTRICT_OPTIONS, row.district),
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Village" />
+        <DataTableColumnHeader column={column} title="District" />
       ),
       cell: ({ row }) =>
-        getOptionLabel(VILLAGE_OPTIONS, row.original.village),
+        getOptionLabel(DISTRICT_OPTIONS, row.original.district),
     },
     {
       id: "topic",

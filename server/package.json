@@ -13,6 +13,7 @@
     "db:logs": "docker compose logs -f postgres",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:status": "docker exec dissertation-postgres psql -U dissertation -d dissertation -c \"SELECT COUNT(*) AS applied_migrations FROM drizzle.__drizzle_migrations;\" -c \"SELECT column_name FROM information_schema.columns WHERE table_name = 'sessions' AND column_name IN ('district', 'village');\"",
     "db:seed": "NODE_ENV=development tsx src/db/seed.ts",
     "db:studio": "drizzle-kit studio"
   },

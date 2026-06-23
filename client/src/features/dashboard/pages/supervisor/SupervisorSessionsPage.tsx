@@ -4,13 +4,14 @@ import type { RowSelectionState } from "@tanstack/react-table";
 import { DataTablePage } from "@/components/data-table/data-table-page";
 import { SessionsDataTable } from "@/features/dashboard/components/SessionsDataTable";
 import { useSupervisorSessions } from "@/hooks/use-supervisor-sessions";
-import { VILLAGE_OPTIONS } from "@/lib/constants";
+import { DISTRICT_OPTIONS } from "@/lib/constants";
 import { isApiError } from "@/lib/api-error";
 import { getOptionLabel } from "@/lib/option-label";
-import type { SessionVillageFilter } from "@/types/session";
+import type { SessionDistrictFilter } from "@/types/session";
 
 export function SupervisorSessionsPage() {
-  const [villageFilter, setVillageFilter] = useState<SessionVillageFilter>("all");
+  const [districtFilter, setDistrictFilter] =
+    useState<SessionDistrictFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
@@ -18,16 +19,16 @@ export function SupervisorSessionsPage() {
   const sessions = data?.sessions ?? [];
 
   const emptyMessage = useMemo(() => {
-    if (villageFilter === "all") {
+    if (districtFilter === "all") {
       return "No sessions found for workers in your organisation.";
     }
 
-    const villageLabel = getOptionLabel(VILLAGE_OPTIONS, villageFilter);
-    return `No sessions in ${villageLabel}.`;
-  }, [villageFilter]);
+    const districtLabel = getOptionLabel(DISTRICT_OPTIONS, districtFilter);
+    return `No sessions in ${districtLabel}.`;
+  }, [districtFilter]);
 
-  function handleVillageFilterChange(value: SessionVillageFilter) {
-    setVillageFilter(value);
+  function handleDistrictFilterChange(value: SessionDistrictFilter) {
+    setDistrictFilter(value);
     setRowSelection({});
     setSearchQuery("");
   }
@@ -62,8 +63,8 @@ export function SupervisorSessionsPage() {
       <SessionsDataTable
         sessions={sessions}
         emptyMessage={emptyMessage}
-        villageFilter={villageFilter}
-        onVillageFilterChange={handleVillageFilterChange}
+        districtFilter={districtFilter}
+        onDistrictFilterChange={handleDistrictFilterChange}
         searchQuery={searchQuery}
         onSearchQueryChange={setSearchQuery}
         rowSelection={rowSelection}

@@ -33,7 +33,7 @@ export function createWorkersExportPdf(
     for (const session of worker.sessions) {
       doc.fontSize(11).text(`Session ${session.sessionId}`);
       doc.fontSize(10).text(`Date: ${session.sessionDate}`);
-      doc.text(`Village: ${session.village} | Topic: ${session.topic}`);
+      doc.text(`District: ${session.district} | Topic: ${session.topic}`);
       doc.text(`Duration: ${session.durationMin} min | Total reached: ${session.totalReached}`);
       if (session.keyIssues) {
         doc.text(`Key issues: ${session.keyIssues}`);

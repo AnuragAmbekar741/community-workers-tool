@@ -10,7 +10,7 @@ import {
 import {
   formatSessionDate,
   formatSessionTopic,
-  formatSessionVillage,
+  formatSessionDistrict,
 } from "@/lib/session-format";
 import type { SessionDto } from "@/types/session";
 
@@ -24,7 +24,7 @@ export function SessionCard({ session }: SessionCardProps) {
       <Card className="transition-colors hover:bg-muted/30">
         <CardHeader>
           <CardTitle>{formatSessionDate(session.sessionDate)}</CardTitle>
-          <CardDescription>{formatSessionVillage(session)}</CardDescription>
+          <CardDescription>{formatSessionDistrict(session)}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-1 text-base">
           <p className="text-foreground">{formatSessionTopic(session)}</p>

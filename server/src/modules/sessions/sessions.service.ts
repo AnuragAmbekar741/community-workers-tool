@@ -3,7 +3,6 @@ import { nextSessionIdFromMax } from "../../lib/id-generator.js";
 import {
   assertSessionDateNotFuture,
   assertTotalReachedNonZero,
-  assertVillageInWorkerVillages,
   computeTotalReached,
 } from "../../lib/session-validation.js";
 import type { Session } from "../../db/schema/sessions.js";
@@ -19,7 +18,7 @@ export interface SupervisorAnalytics {
   totalSessions: number;
   totalReached: number;
   byTopic: Record<string, number>;
-  byVillage: Record<string, number>;
+  byDistrict: Record<string, number>;
   byWorker: Record<string, { sessions: number; totalReached: number }>;
 }
 
@@ -47,8 +46,8 @@ export class SessionsService {
     workerId: string,
     input: CreateSessionBody,
   ): Promise<Session> {
-    const worker = await this.workersService.assertApproved(workerId);
-    this.validateSessionInput(input, worker.villages);
+    await this.workersService.assertApproved(workerId);
+    this.validateSessionInput(input);
 
     const sessionId = nextSessionIdFromMax(
       await this.sessionsRepo.getMaxSessionId(),
@@ -59,7 +58,7 @@ export class SessionsService {
       sessionId,
       workerId,
       sessionDate: input.sessionDate,
-      village: input.village,
+      district: input.district,
       topic: input.topic,
       topicOther: input.topic === "other" ? input.topicOther ?? null : null,
       durationMin: input.durationMin,
@@ -101,13 +100,12 @@ export class SessionsService {
     input: UpdateSessionBody,
   ): Promise<{ session: Session }> {
     const existing = await this.getSessionOrThrow(sessionId);
-    const worker = await this.workersService.findById(existing.workerId);
-    this.validateSessionInput(input, worker.villages);
+    this.validateSessionInput(input);
 
     const totalReached = computeTotalReached(input);
     const session = await this.sessionsRepo.update(sessionId, {
       sessionDate: input.sessionDate,
-      village: input.village,
+      district: input.district,
       topic: input.topic,
       topicOther: input.topic === "other" ? input.topicOther ?? null : null,
       durationMin: input.durationMin,
@@ -173,7 +171,7 @@ export class SessionsService {
       totalSessions: 0,
       totalReached: 0,
       byTopic: {},
-      byVillage: {},
+      byDistrict: {},
       byWorker: {},
     };
 
@@ -183,8 +181,8 @@ export class SessionsService {
 
       analytics.byTopic[row.topic] =
         (analytics.byTopic[row.topic] ?? 0) + row.sessionCount;
-      analytics.byVillage[row.village] =
-        (analytics.byVillage[row.village] ?? 0) + row.sessionCount;
+      analytics.byDistrict[row.district] =
+        (analytics.byDistrict[row.district] ?? 0) + row.sessionCount;
 
       const workerStats = analytics.byWorker[row.workerId] ?? {
         sessions: 0,
@@ -233,12 +231,8 @@ export class SessionsService {
     };
   }
 
-  private validateSessionInput(
-    input: CreateSessionBody,
-    workerVillages: readonly string[],
-  ): void {
+  private validateSessionInput(input: CreateSessionBody): void {
     assertSessionDateNotFuture(input.sessionDate);
-    assertVillageInWorkerVillages(input.village, workerVillages);
 
     if (input.topic === "other" && !input.topicOther?.trim()) {
       throw new ValidationError("topicOther is required when topic is other");

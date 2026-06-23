@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import type { CreateSessionRequest } from "@/types/session";
 
-import { TOPIC, VILLAGE, type Topic, type Village } from "./constants";
+import { DISTRICT, TOPIC, type District } from "./constants";
 
 function requiredEnum<const T extends readonly [string, ...string[]]>(
   values: T,
@@ -19,27 +19,62 @@ function requiredEnum<const T extends readonly [string, ...string[]]>(
     });
 }
 
-const attendanceField = z.coerce
-  .number({ error: "Required" })
-  .int("Must be a whole number")
-  .min(0, "Must be 0 or more");
+function requiredCountField(emptyMessage: string) {
+  return z.string().trim().transform((value, ctx) => {
+    if (value === "") {
+      ctx.addIssue({ code: "custom", message: emptyMessage });
+      return z.NEVER;
+    }
+
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed < 0) {
+      ctx.addIssue({ code: "custom", message: "Must be 0 or more" });
+      return z.NEVER;
+    }
+
+    return parsed;
+  });
+}
+
+function requiredDurationField() {
+  return z.string().trim().transform((value, ctx) => {
+    if (value === "") {
+      ctx.addIssue({ code: "custom", message: "Duration is required" });
+      return z.NEVER;
+    }
+
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed) || !Number.isInteger(parsed)) {
+      ctx.addIssue({ code: "custom", message: "Duration must be a whole number" });
+      return z.NEVER;
+    }
+
+    if (parsed < 10) {
+      ctx.addIssue({ code: "custom", message: "Minimum 10 minutes" });
+      return z.NEVER;
+    }
+
+    if (parsed > 300) {
+      ctx.addIssue({ code: "custom", message: "Maximum 300 minutes" });
+      return z.NEVER;
+    }
+
+    return parsed;
+  });
+}
 
 const sessionFormBaseSchema = z.object({
   sessionDate: z.string().min(1, "Session date is required"),
-  village: requiredEnum(VILLAGE, "Village is required"),
+  district: requiredEnum(DISTRICT, "District is required"),
   topic: requiredEnum(TOPIC, "Topic is required"),
   topicOther: z.string().optional(),
-  durationMin: z.coerce
-    .number({ error: "Duration is required" })
-    .int("Duration must be a whole number")
-    .min(10, "Minimum 10 minutes")
-    .max(300, "Maximum 300 minutes"),
-  nWomen: attendanceField,
-  nMen: attendanceField,
-  nGirls: attendanceField,
-  nBoys: attendanceField,
-  nElders: attendanceField,
-  nOthers: attendanceField,
+  durationMin: requiredDurationField(),
+  nWomen: requiredCountField("Enter 0 if there were no women"),
+  nMen: requiredCountField("Enter 0 if there were no men"),
+  nGirls: requiredCountField("Enter 0 if there were no girls"),
+  nBoys: requiredCountField("Enter 0 if there were no boys"),
+  nElders: requiredCountField("Enter 0 if there were no elders"),
+  nOthers: requiredCountField("Enter 0 if there were no others"),
   keyIssues: z.string().optional(),
 });
 
@@ -53,13 +88,7 @@ export const sessionFormSchema = sessionFormBaseSchema.superRefine(
       });
     }
 
-    const total =
-      data.nWomen +
-      data.nMen +
-      data.nGirls +
-      data.nBoys +
-      data.nElders +
-      data.nOthers;
+    const total = computeTotalReached(data);
 
     if (total <= 0) {
       ctx.addIssue({
@@ -85,44 +114,35 @@ export const sessionFormSchema = sessionFormBaseSchema.superRefine(
   },
 );
 
-export type SessionFormValues = {
-  sessionDate: string;
-  village: Village;
-  topic: Topic;
-  topicOther?: string;
-  durationMin: number;
-  nWomen: number;
-  nMen: number;
-  nGirls: number;
-  nBoys: number;
-  nElders: number;
-  nOthers: number;
-  keyIssues?: string;
-};
+export type SessionFormValues = z.output<typeof sessionFormSchema>;
 
-export type SessionFormInput = z.input<typeof sessionFormSchema>;
+export type SessionFormInput = z.input<typeof sessionFormBaseSchema>;
 
-export const sessionFormDefaultValues: SessionFormInput = {
-  sessionDate: "",
-  village: "",
-  topic: "",
-  topicOther: "",
-  durationMin: "",
-  nWomen: "",
-  nMen: "",
-  nGirls: "",
-  nBoys: "",
-  nElders: "",
-  nOthers: "",
-  keyIssues: "",
-};
+export function sessionFormDefaultValues(
+  defaultDistrict?: District,
+): SessionFormInput {
+  return {
+    sessionDate: "",
+    district: defaultDistrict ?? "",
+    topic: "",
+    topicOther: "",
+    durationMin: "",
+    nWomen: "",
+    nMen: "",
+    nGirls: "",
+    nBoys: "",
+    nElders: "",
+    nOthers: "",
+    keyIssues: "",
+  };
+}
 
 export function toCreateSessionRequest(
   values: SessionFormValues,
 ): CreateSessionRequest {
   return {
     sessionDate: values.sessionDate,
-    village: values.village,
+    district: values.district,
     topic: values.topic,
     topicOther: values.topic === "other" ? values.topicOther?.trim() : undefined,
     durationMin: values.durationMin,
@@ -137,64 +157,23 @@ export function toCreateSessionRequest(
 }
 
 export function computeTotalReached(values: {
-  nWomen: number;
-  nMen: number;
-  nGirls: number;
-  nBoys: number;
-  nElders: number;
-  nOthers: number;
+  nWomen?: number;
+  nMen?: number;
+  nGirls?: number;
+  nBoys?: number;
+  nElders?: number;
+  nOthers?: number;
 }): number {
   return (
-    values.nWomen +
-    values.nMen +
-    values.nGirls +
-    values.nBoys +
-    values.nElders +
-    values.nOthers
+    (values.nWomen ?? 0) +
+    (values.nMen ?? 0) +
+    (values.nGirls ?? 0) +
+    (values.nBoys ?? 0) +
+    (values.nElders ?? 0) +
+    (values.nOthers ?? 0)
   );
 }
 
-export function createSessionFormSchema(allowedVillages: Village[]) {
-  return sessionFormBaseSchema
-    .superRefine((data, ctx) => {
-      if (data.village && !allowedVillages.includes(data.village as Village)) {
-        ctx.addIssue({
-          code: "custom",
-          message: "Village is not assigned to you",
-          path: ["village"],
-        });
-      }
-    })
-    .superRefine((data, ctx) => {
-      if (data.topic === "other" && !data.topicOther?.trim()) {
-        ctx.addIssue({
-          code: "custom",
-          message: "Please describe the topic",
-          path: ["topicOther"],
-        });
-      }
-
-      const total = computeTotalReached(data);
-      if (total <= 0) {
-        ctx.addIssue({
-          code: "custom",
-          message: "At least one participant count must be greater than 0",
-          path: ["nWomen"],
-        });
-      }
-
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const [year, month, day] = data.sessionDate.split("-").map(Number);
-      if (year && month && day) {
-        const sessionDay = new Date(year, month - 1, day);
-        if (sessionDay > today) {
-          ctx.addIssue({
-            code: "custom",
-            message: "Session date cannot be in the future",
-            path: ["sessionDate"],
-          });
-        }
-      }
-    });
+export function createSessionFormSchema() {
+  return sessionFormSchema;
 }

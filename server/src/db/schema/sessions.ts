@@ -7,7 +7,7 @@ export const sessions = pgTable("sessions", {
     .notNull()
     .references(() => users.systemId),
   sessionDate: date("session_date").notNull(),
-  village: varchar("village", { length: 32 }).notNull(),
+  district: varchar("district", { length: 64 }).notNull(),
   topic: varchar("topic", { length: 64 }).notNull(),
   topicOther: text("topic_other"),
   durationMin: integer("duration_min").notNull(),

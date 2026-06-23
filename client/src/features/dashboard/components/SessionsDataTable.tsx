@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import type { OnChangeFn, RowSelectionState } from "@tanstack/react-table";
 
 import { DataTable } from "@/components/data-table/data-table";
-import type { SessionDto, SessionVillageFilter } from "@/types/session";
+import type { SessionDto, SessionDistrictFilter } from "@/types/session";
 
 import { getSessionsColumns } from "./sessions-columns";
 import { SessionsTableToolbar } from "./SessionsTableToolbar";
@@ -10,8 +10,8 @@ import { SessionsTableToolbar } from "./SessionsTableToolbar";
 type SessionsDataTableProps = {
   sessions: SessionDto[];
   emptyMessage: string;
-  villageFilter: SessionVillageFilter;
-  onVillageFilterChange: (value: SessionVillageFilter) => void;
+  districtFilter: SessionDistrictFilter;
+  onDistrictFilterChange: (value: SessionDistrictFilter) => void;
   searchQuery: string;
   onSearchQueryChange: (value: string) => void;
   rowSelection: RowSelectionState;
@@ -21,8 +21,8 @@ type SessionsDataTableProps = {
 export function SessionsDataTable({
   sessions,
   emptyMessage,
-  villageFilter,
-  onVillageFilterChange,
+  districtFilter,
+  onDistrictFilterChange,
   searchQuery,
   onSearchQueryChange,
   rowSelection,
@@ -37,7 +37,7 @@ export function SessionsDataTable({
     const query = searchQuery.trim().toLowerCase();
 
     return sessions.filter((session) => {
-      if (villageFilter !== "all" && session.village !== villageFilter) {
+      if (districtFilter !== "all" && session.district !== districtFilter) {
         return false;
       }
 
@@ -50,7 +50,7 @@ export function SessionsDataTable({
         session.workerId.toLowerCase().includes(query)
       );
     });
-  }, [sessions, villageFilter, searchQuery]);
+  }, [sessions, districtFilter, searchQuery]);
 
   return (
     <DataTable
@@ -65,8 +65,8 @@ export function SessionsDataTable({
       layout="sticky"
       toolbar={
         <SessionsTableToolbar
-          villageFilter={villageFilter}
-          onVillageFilterChange={onVillageFilterChange}
+          districtFilter={districtFilter}
+          onDistrictFilterChange={onDistrictFilterChange}
           searchQuery={searchQuery}
           onSearchQueryChange={onSearchQueryChange}
         />

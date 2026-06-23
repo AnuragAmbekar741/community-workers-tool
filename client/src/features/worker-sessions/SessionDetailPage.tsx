@@ -16,7 +16,7 @@ import { isApiError } from "@/lib/api-error";
 import {
   formatSessionDate,
   formatSessionTopic,
-  formatSessionVillage,
+  formatSessionDistrict,
 } from "@/lib/session-format";
 
 type DetailFieldProps = {
@@ -92,7 +92,7 @@ export function SessionDetailPage() {
           label="Date"
           value={formatSessionDate(session.sessionDate)}
         />
-        <DetailField label="Village" value={formatSessionVillage(session)} />
+        <DetailField label="District" value={formatSessionDistrict(session)} />
         <DetailField label="Topic" value={formatSessionTopic(session)} />
         <DetailField
           label="Duration"

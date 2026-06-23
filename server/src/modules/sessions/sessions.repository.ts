@@ -14,7 +14,7 @@ export interface AnalyticsFilters {
 export interface SessionAggregateRow {
   workerId: string;
   topic: string;
-  village: string;
+  district: string;
   sessionCount: number;
   totalReached: number;
 }
@@ -116,13 +116,13 @@ export class SessionsRepository {
       .select({
         workerId: sessions.workerId,
         topic: sessions.topic,
-        village: sessions.village,
+        district: sessions.district,
         sessionCount: sql<number>`count(*)::int`,
         totalReached: sql<number>`coalesce(sum(${sessions.totalReached}), 0)::int`,
       })
       .from(sessions)
       .where(and(...conditions))
-      .groupBy(sessions.workerId, sessions.topic, sessions.village);
+      .groupBy(sessions.workerId, sessions.topic, sessions.district);
 
     return rows;
   }

@@ -8,46 +8,46 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/base/select";
-import { VILLAGE_OPTIONS } from "@/lib/constants";
-import type { SessionVillageFilter } from "@/types/session";
+import { DISTRICT_OPTIONS } from "@/lib/constants";
+import type { SessionDistrictFilter } from "@/types/session";
 
-const VILLAGE_FILTER_OPTIONS: Array<{
-  value: SessionVillageFilter;
+const DISTRICT_FILTER_OPTIONS: Array<{
+  value: SessionDistrictFilter;
   label: string;
 }> = [
-  { value: "all", label: "All villages" },
-  ...VILLAGE_OPTIONS.map((option) => ({
+  { value: "all", label: "All districts" },
+  ...DISTRICT_OPTIONS.map((option) => ({
     value: option.value,
     label: option.label,
   })),
 ];
 
 type SessionsTableToolbarProps = {
-  villageFilter: SessionVillageFilter;
-  onVillageFilterChange: (value: SessionVillageFilter) => void;
+  districtFilter: SessionDistrictFilter;
+  onDistrictFilterChange: (value: SessionDistrictFilter) => void;
   searchQuery: string;
   onSearchQueryChange: (value: string) => void;
 };
 
 export function SessionsTableToolbar({
-  villageFilter,
-  onVillageFilterChange,
+  districtFilter,
+  onDistrictFilterChange,
   searchQuery,
   onSearchQueryChange,
 }: SessionsTableToolbarProps) {
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <Select
-        value={villageFilter}
+        value={districtFilter}
         onValueChange={(value) =>
-          onVillageFilterChange(value as SessionVillageFilter)
+          onDistrictFilterChange(value as SessionDistrictFilter)
         }
       >
         <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="All villages" />
+          <SelectValue placeholder="All districts" />
         </SelectTrigger>
         <SelectContent>
-          {VILLAGE_FILTER_OPTIONS.map((option) => (
+          {DISTRICT_FILTER_OPTIONS.map((option) => (
             <SelectItem key={option.value} value={option.value}>
               {option.label}
             </SelectItem>

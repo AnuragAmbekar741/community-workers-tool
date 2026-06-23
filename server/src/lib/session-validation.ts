@@ -34,16 +34,6 @@ export function assertSessionDateNotFuture(dateStr: string): void {
     throw new ValidationError("Session date cannot be in the future");
   }
 }
-
-export function assertVillageInWorkerVillages(
-  village: string,
-  workerVillages: readonly string[],
-): void {
-  if (!workerVillages.includes(village)) {
-    throw new ValidationError("Village must be in the worker's assigned villages");
-  }
-}
-
 function parseDateOnly(dateStr: string): Date {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr);
   if (!match) {

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { zTopic, zVillage } from "../../constants/index.js";
+import { zTopic, zDistrict } from "../../constants/index.js";
 
 const attendanceSchema = z.object({
   nWomen: z.number().int().min(0),
@@ -13,7 +13,7 @@ const attendanceSchema = z.object({
 const sessionBodySchema = z
   .object({
     sessionDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-    village: zVillage,
+    district: zDistrict,
     topic: zTopic,
     topicOther: z.string().optional(),
     durationMin: z.number().int().min(10).max(300),

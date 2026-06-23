@@ -1,8 +1,8 @@
-import type { Topic, Village } from "@/lib/constants";
+import type { District, Topic } from "@/lib/constants";
 
 export type CreateSessionRequest = {
   sessionDate: string;
-  village: Village;
+  district: District;
   topic: Topic;
   topicOther?: string;
   durationMin: number;
@@ -19,7 +19,7 @@ export type SessionDto = {
   sessionId: string;
   workerId: string;
   sessionDate: string;
-  village: Village;
+  district: District;
   topic: Topic;
   topicOther: string | null;
   durationMin: number;
@@ -46,4 +46,4 @@ export type CreateSessionResponse = {
   session: SessionDto;
 };
 
-export type SessionVillageFilter = Village | "all";
+export type SessionDistrictFilter = District | "all";

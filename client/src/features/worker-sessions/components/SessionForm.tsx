@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMemo, useState } from "react";
-import { useForm, useWatch, type Resolver } from "react-hook-form";
+import { useForm, useWatch, type Control, type Resolver } from "react-hook-form";
 
 import { Button } from "@/components/base/button";
 import {
@@ -22,7 +22,7 @@ import {
 } from "@/components/base/select";
 import { Textarea } from "@/components/base/textarea";
 import { useCreateSession } from "@/hooks/use-sessions";
-import { TOPIC_OPTIONS, VILLAGE_OPTIONS, type Village } from "@/lib/constants";
+import { DISTRICT_OPTIONS, TOPIC_OPTIONS, type District } from "@/lib/constants";
 import { isApiError } from "@/lib/api-error";
 import {
   computeTotalReached,
@@ -34,7 +34,7 @@ import {
 } from "@/lib/session-schema";
 
 type SessionFormProps = {
-  allowedVillages: Village[];
+  defaultDistrict?: District;
 };
 
 function NumberField({
@@ -51,7 +51,7 @@ function NumberField({
     | "nElders"
     | "nOthers";
   label: string;
-  control: ReturnType<typeof useForm<SessionFormInput>>["control"];
+  control: Control<SessionFormInput>;
 }) {
   return (
     <FormField
@@ -64,6 +64,7 @@ function NumberField({
             <Input
               type="number"
               inputMode="numeric"
+              required
               min={name === "durationMin" ? 10 : 0}
               max={name === "durationMin" ? 300 : undefined}
               value={value === undefined || value === null ? "" : String(value)}
@@ -78,19 +79,12 @@ function NumberField({
   );
 }
 
-export function SessionForm({ allowedVillages }: SessionFormProps) {
+export function SessionForm({ defaultDistrict }: SessionFormProps) {
   const navigate = useNavigate();
   const createSessionMutation = useCreateSession();
   const [rootError, setRootError] = useState<string | null>(null);
 
-  const schema = useMemo(
-    () => createSessionFormSchema(allowedVillages),
-    [allowedVillages],
-  );
-
-  const villageOptions = VILLAGE_OPTIONS.filter((option) =>
-    allowedVillages.includes(option.value),
-  );
+  const schema = useMemo(() => createSessionFormSchema(), []);
 
   const form = useForm<SessionFormInput, unknown, SessionFormValues>({
     resolver: zodResolver(schema) as Resolver<
@@ -98,8 +92,10 @@ export function SessionForm({ allowedVillages }: SessionFormProps) {
       unknown,
       SessionFormValues
     >,
-    defaultValues: sessionFormDefaultValues,
+    defaultValues: sessionFormDefaultValues(defaultDistrict),
   });
+
+  const control = form.control as unknown as Control<SessionFormInput>;
 
   const watchedValues = useWatch({ control: form.control });
   const topic = watchedValues.topic;
@@ -134,13 +130,13 @@ export function SessionForm({ allowedVillages }: SessionFormProps) {
         noValidate
       >
         <FormField
-          control={form.control}
+          control={control}
           name="sessionDate"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Session date</FormLabel>
               <FormControl>
-                <Input type="date" {...field} />
+                <Input type="date" required {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -148,22 +144,22 @@ export function SessionForm({ allowedVillages }: SessionFormProps) {
         />
 
         <FormField
-          control={form.control}
-          name="village"
+          control={control}
+          name="district"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Village</FormLabel>
+              <FormLabel>District</FormLabel>
               <Select
                 value={field.value || undefined}
                 onValueChange={field.onChange}
               >
                 <FormControl>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select village" />
+                    <SelectValue placeholder="Select district" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {villageOptions.map((option) => (
+                  {DISTRICT_OPTIONS.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>
@@ -176,7 +172,7 @@ export function SessionForm({ allowedVillages }: SessionFormProps) {
         />
 
         <FormField
-          control={form.control}
+          control={control}
           name="topic"
           render={({ field }) => (
             <FormItem>
@@ -205,13 +201,13 @@ export function SessionForm({ allowedVillages }: SessionFormProps) {
 
         {topic === "other" ? (
           <FormField
-            control={form.control}
+            control={control}
             name="topicOther"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Topic description</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input required {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -220,30 +216,30 @@ export function SessionForm({ allowedVillages }: SessionFormProps) {
         ) : null}
 
         <NumberField
-          control={form.control}
+          control={control}
           name="durationMin"
           label="Duration (minutes)"
         />
 
         <div className="space-y-4 rounded-md border border-border p-4">
           <p className="text-base font-medium">Participants</p>
-          <NumberField control={form.control} name="nWomen" label="Women" />
-          <NumberField control={form.control} name="nMen" label="Men" />
-          <NumberField control={form.control} name="nGirls" label="Girls" />
-          <NumberField control={form.control} name="nBoys" label="Boys" />
-          <NumberField control={form.control} name="nElders" label="Elders" />
-          <NumberField control={form.control} name="nOthers" label="Others" />
+          <NumberField control={control} name="nWomen" label="Women" />
+          <NumberField control={control} name="nMen" label="Men" />
+          <NumberField control={control} name="nGirls" label="Girls" />
+          <NumberField control={control} name="nBoys" label="Boys" />
+          <NumberField control={control} name="nElders" label="Elders" />
+          <NumberField control={control} name="nOthers" label="Others" />
           <p className="text-base text-muted-foreground">
             Total reached: <span className="font-medium">{totalReached}</span>
           </p>
         </div>
 
         <FormField
-          control={form.control}
+          control={control}
           name="keyIssues"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Key issues (optional)</FormLabel>
+              <FormLabel>Key issues</FormLabel>
               <FormControl>
                 <Textarea rows={4} {...field} />
               </FormControl>

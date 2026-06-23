@@ -18,7 +18,7 @@ export function NewSessionPage() {
 
   return (
     <WorkerPageShell title="New session" backTo="/worker">
-      <SessionForm allowedVillages={me.worker.villages} />
+      <SessionForm defaultDistrict={me.worker.district} />
     </WorkerPageShell>
   );
 }
