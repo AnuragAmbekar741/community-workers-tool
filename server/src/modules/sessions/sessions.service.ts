@@ -1,6 +1,7 @@
 import { ForbiddenError, NotFoundError, ValidationError } from "../../lib/errors.js";
 import { nextSessionIdFromMax } from "../../lib/id-generator.js";
 import {
+  assertReferralFields,
   assertSessionDateNotFuture,
   assertTotalReachedNonZero,
   computeTotalReached,
@@ -70,6 +71,11 @@ export class SessionsService {
       nOthers: input.nOthers,
       totalReached,
       keyIssues: input.keyIssues ?? null,
+      referralsMade: input.referralsMade,
+      nReferrals: input.referralsMade ? input.nReferrals : 0,
+      referralReason: input.referralsMade
+        ? input.referralReason?.trim() ?? null
+        : null,
     });
   }
 
@@ -117,6 +123,11 @@ export class SessionsService {
       nOthers: input.nOthers,
       totalReached,
       keyIssues: input.keyIssues ?? null,
+      referralsMade: input.referralsMade,
+      nReferrals: input.referralsMade ? input.nReferrals : 0,
+      referralReason: input.referralsMade
+        ? input.referralReason?.trim() ?? null
+        : null,
     });
 
     return { session };
@@ -240,6 +251,7 @@ export class SessionsService {
 
     const totalReached = computeTotalReached(input);
     assertTotalReachedNonZero(totalReached);
+    assertReferralFields(input);
   }
 
   private async getSessionOrThrow(sessionId: string): Promise<Session> {

@@ -99,6 +99,7 @@ export function SessionForm({ defaultDistrict }: SessionFormProps) {
 
   const watchedValues = useWatch({ control: form.control });
   const topic = watchedValues.topic;
+  const referralsMade = watchedValues.referralsMade;
   const totalReached = computeTotalReached({
     nWomen: Number(watchedValues.nWomen) || 0,
     nMen: Number(watchedValues.nMen) || 0,
@@ -234,12 +235,90 @@ export function SessionForm({ defaultDistrict }: SessionFormProps) {
           </p>
         </div>
 
+        <div className="space-y-4 rounded-md border border-border p-4">
+          <p className="text-base font-medium">Referrals</p>
+          <FormField
+            control={control}
+            name="referralsMade"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Referrals made?</FormLabel>
+                <Select
+                  value={field.value || undefined}
+                  onValueChange={(value) => {
+                    field.onChange(value);
+                    if (value === "no") {
+                      form.setValue("nReferrals", "");
+                      form.setValue("referralReason", "");
+                      form.clearErrors(["nReferrals", "referralReason"]);
+                    }
+                  }}
+                >
+                  <FormControl>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select yes or no" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="yes">Yes</SelectItem>
+                    <SelectItem value="no">No</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {referralsMade === "yes" ? (
+            <>
+              <FormField
+                control={control}
+                name="nReferrals"
+                render={({ field: { value, onChange, ...field } }) => (
+                  <FormItem>
+                    <FormLabel>Number of referrals</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        inputMode="numeric"
+                        required
+                        min={1}
+                        value={
+                          value === undefined || value === null
+                            ? ""
+                            : String(value)
+                        }
+                        onChange={(event) => onChange(event.target.value)}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="referralReason"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Reason for referral</FormLabel>
+                    <FormControl>
+                      <Input required {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </>
+          ) : null}
+        </div>
+
         <FormField
           control={control}
           name="keyIssues"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Key issues</FormLabel>
+              <FormLabel>Notes (optional)</FormLabel>
               <FormControl>
                 <Textarea rows={4} {...field} />
               </FormControl>

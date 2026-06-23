@@ -56,7 +56,7 @@
 | session_id    | string    | PK   | `SESS000001` (auto)                                    |
 | worker_id     | string    | Yes  | FK → users.system_id (a `CW000x`)                      |
 | session_date  | date      | Yes  | Cannot be in the future                                |
-| village       | enum      | Yes  | `village` constant. Must be in the worker's `villages` |
+| district      | enum      | Yes  | `district` constant                                    |
 | topic         | enum      | Yes  | `topic` constant                                       |
 | topic_other   | string    | No   | Only if topic = `other`                                |
 | duration_min  | int       | Yes  | 10–300                                                 |
@@ -67,7 +67,10 @@
 | n_elders      | int       | Yes  | ≥ 0 (60+)                                              |
 | n_others      | int       | Yes  | ≥ 0                                                    |
 | total_reached | int       | Auto | Sum of the six `n_*`. Must be > 0                      |
-| key_issues    | text      | No   | Free-text follow-up notes                              |
+| key_issues    | text      | No   | Free-text notes (optional)                             |
+| referrals_made | boolean  | Yes  | Whether referrals were made                            |
+| n_referrals   | int       | Yes  | ≥ 0; must be ≥ 1 when `referrals_made` is true         |
+| referral_reason | text    | No   | Required when `referrals_made` is true                 |
 | created_at    | timestamp | Auto |                                                        |
 
 ---
@@ -136,5 +139,5 @@ users.system_id ──1:1──▶ workers.system_id            (worker profile 
 users.system_id ──1:many──▶ sessions.worker_id         (a worker logs many sessions)
 workers.supervisor_id ──many:1──▶ users.system_id      (worker → supervisor, same org)
 users.organisation ── shared by worker + supervisor    (worker's org = supervisor's org)
-sessions.village / .topic, workers.villages / .district ── validated against server constants
+sessions.district / .topic, workers.villages / .district ── validated against server constants
 ```

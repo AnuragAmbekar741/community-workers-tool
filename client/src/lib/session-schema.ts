@@ -63,6 +63,34 @@ function requiredDurationField() {
   });
 }
 
+function requiredYesNoField(message: string) {
+  return z
+    .union([z.literal(""), z.literal("yes"), z.literal("no")])
+    .transform((value, ctx) => {
+      if (value === "") {
+        ctx.addIssue({ code: "custom", message });
+        return z.NEVER;
+      }
+      return value === "yes";
+    });
+}
+
+function referralCountField() {
+  return z.string().trim().transform((value, ctx) => {
+    if (value === "") {
+      return 0;
+    }
+
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed < 0) {
+      ctx.addIssue({ code: "custom", message: "Must be 0 or more" });
+      return z.NEVER;
+    }
+
+    return parsed;
+  });
+}
+
 const sessionFormBaseSchema = z.object({
   sessionDate: z.string().min(1, "Session date is required"),
   district: requiredEnum(DISTRICT, "District is required"),
@@ -76,6 +104,11 @@ const sessionFormBaseSchema = z.object({
   nElders: requiredCountField("Enter 0 if there were no elders"),
   nOthers: requiredCountField("Enter 0 if there were no others"),
   keyIssues: z.string().optional(),
+  referralsMade: requiredYesNoField(
+    "Please select whether referrals were made",
+  ),
+  nReferrals: referralCountField(),
+  referralReason: z.string().optional(),
 });
 
 export const sessionFormSchema = sessionFormBaseSchema.superRefine(
@@ -86,6 +119,23 @@ export const sessionFormSchema = sessionFormBaseSchema.superRefine(
         message: "Please describe the topic",
         path: ["topicOther"],
       });
+    }
+
+    if (data.referralsMade) {
+      if (data.nReferrals < 1) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Number of referrals must be at least 1",
+          path: ["nReferrals"],
+        });
+      }
+      if (!data.referralReason?.trim()) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Reason for referral is required",
+          path: ["referralReason"],
+        });
+      }
     }
 
     const total = computeTotalReached(data);
@@ -134,6 +184,9 @@ export function sessionFormDefaultValues(
     nElders: "",
     nOthers: "",
     keyIssues: "",
+    referralsMade: "",
+    nReferrals: "",
+    referralReason: "",
   };
 }
 
@@ -153,6 +206,11 @@ export function toCreateSessionRequest(
     nElders: values.nElders,
     nOthers: values.nOthers,
     keyIssues: values.keyIssues?.trim() || undefined,
+    referralsMade: values.referralsMade,
+    nReferrals: values.referralsMade ? values.nReferrals : 0,
+    referralReason: values.referralsMade
+      ? values.referralReason?.trim()
+      : undefined,
   };
 }
 

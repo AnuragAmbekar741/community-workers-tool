@@ -13,6 +13,9 @@ export type CreateSessionRequest = {
   nElders: number;
   nOthers: number;
   keyIssues?: string;
+  referralsMade: boolean;
+  nReferrals: number;
+  referralReason?: string;
 };
 
 export type SessionDto = {
@@ -31,6 +34,9 @@ export type SessionDto = {
   nOthers: number;
   totalReached: number;
   keyIssues: string | null;
+  referralsMade: boolean;
+  nReferrals: number;
+  referralReason: string | null;
   createdAt: string;
 };
 

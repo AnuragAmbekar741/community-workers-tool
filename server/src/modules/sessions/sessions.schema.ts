@@ -18,6 +18,9 @@ const sessionBodySchema = z
     topicOther: z.string().optional(),
     durationMin: z.number().int().min(10).max(300),
     keyIssues: z.string().optional(),
+    referralsMade: z.boolean(),
+    nReferrals: z.number().int().min(0),
+    referralReason: z.string().optional(),
   })
   .merge(attendanceSchema)
   .superRefine((data, ctx) => {
@@ -26,6 +29,29 @@ const sessionBodySchema = z
         code: z.ZodIssueCode.custom,
         message: "topicOther is required when topic is other",
         path: ["topicOther"],
+      });
+    }
+
+    if (data.referralsMade) {
+      if (data.nReferrals < 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Number of referrals must be at least 1",
+          path: ["nReferrals"],
+        });
+      }
+      if (!data.referralReason?.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Referral reason is required",
+          path: ["referralReason"],
+        });
+      }
+    } else if (data.nReferrals !== 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "nReferrals must be 0 when no referrals were made",
+        path: ["nReferrals"],
       });
     }
   });

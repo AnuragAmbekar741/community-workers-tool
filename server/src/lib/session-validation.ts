@@ -34,6 +34,27 @@ export function assertSessionDateNotFuture(dateStr: string): void {
     throw new ValidationError("Session date cannot be in the future");
   }
 }
+
+export interface ReferralInput {
+  referralsMade: boolean;
+  nReferrals: number;
+  referralReason?: string;
+}
+
+export function assertReferralFields(input: ReferralInput): void {
+  if (input.referralsMade) {
+    if (input.nReferrals < 1) {
+      throw new ValidationError("Number of referrals must be at least 1");
+    }
+    if (!input.referralReason?.trim()) {
+      throw new ValidationError("Referral reason is required");
+    }
+    return;
+  }
+  if (input.nReferrals !== 0) {
+    throw new ValidationError("nReferrals must be 0 when no referrals were made");
+  }
+}
 function parseDateOnly(dateStr: string): Date {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr);
   if (!match) {

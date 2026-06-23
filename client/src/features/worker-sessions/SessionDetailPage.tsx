@@ -109,7 +109,23 @@ export function SessionDetailPage() {
           value={String(session.totalReached)}
         />
         <DetailField
-          label="Key issues"
+          label="Referrals made"
+          value={session.referralsMade ? "Yes" : "No"}
+        />
+        {session.referralsMade ? (
+          <>
+            <DetailField
+              label="Number of referrals"
+              value={String(session.nReferrals)}
+            />
+            <DetailField
+              label="Reason for referral"
+              value={session.referralReason?.trim() || "—"}
+            />
+          </>
+        ) : null}
+        <DetailField
+          label="Notes"
           value={session.keyIssues?.trim() || "—"}
         />
       </div>

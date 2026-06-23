@@ -177,7 +177,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"sessionDate\": \"2026-06-01\",\n  \"village\": \"village_a\",\n  \"topic\": \"srh\",\n  \"durationMin\": 60,\n  \"nWomen\": 5,\n  \"nMen\": 2,\n  \"nGirls\": 3,\n  \"nBoys\": 1,\n  \"nElders\": 0,\n  \"nOthers\": 0,\n  \"keyIssues\": \"Optional notes\"\n}"
+              "raw": "{\n  \"sessionDate\": \"2026-06-01\",\n  \"district\": \"gaborone\",\n  \"topic\": \"srh\",\n  \"durationMin\": 60,\n  \"nWomen\": 5,\n  \"nMen\": 2,\n  \"nGirls\": 3,\n  \"nBoys\": 1,\n  \"nElders\": 0,\n  \"nOthers\": 0,\n  \"referralsMade\": false,\n  \"nReferrals\": 0,\n  \"keyIssues\": \"Optional notes\"\n}"
             },
             "url": "{{baseUrl}}/sessions"
           },
@@ -281,7 +281,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"sessionDate\": \"2026-06-02\",\n  \"village\": \"village_a\",\n  \"topic\": \"srh\",\n  \"durationMin\": 90,\n  \"nWomen\": 6,\n  \"nMen\": 2,\n  \"nGirls\": 3,\n  \"nBoys\": 1,\n  \"nElders\": 0,\n  \"nOthers\": 0\n}"
+              "raw": "{\n  \"sessionDate\": \"2026-06-02\",\n  \"district\": \"gaborone\",\n  \"topic\": \"srh\",\n  \"durationMin\": 90,\n  \"nWomen\": 6,\n  \"nMen\": 2,\n  \"nGirls\": 3,\n  \"nBoys\": 1,\n  \"nElders\": 0,\n  \"nOthers\": 0,\n  \"referralsMade\": true,\n  \"nReferrals\": 2,\n  \"referralReason\": \"Referred to clinic\"\n}"
             },
             "url": "{{baseUrl}}/admin/sessions/{{sessionId}}"
           }
