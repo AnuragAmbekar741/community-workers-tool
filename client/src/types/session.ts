@@ -53,3 +53,12 @@ export type CreateSessionResponse = {
 };
 
 export type SessionDistrictFilter = District | "all";
+export type SessionWorkerFilter = "all" | string;
+export type SessionTopicFilter = Topic | "all";
+
+export type SessionTableFilters = {
+  district: SessionDistrictFilter;
+  workerId: SessionWorkerFilter;
+  topic: SessionTopicFilter;
+  searchQuery: string;
+};

@@ -2,6 +2,11 @@ import type { ColumnDef } from "@tanstack/react-table";
 
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { getDataTableRowSelectColumn } from "@/components/data-table/data-table-row-select-column";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/base/tooltip";
 import { DISTRICT_OPTIONS } from "@/lib/constants";
 import { getOptionLabel } from "@/lib/option-label";
 import {
@@ -94,12 +99,45 @@ export function getSessionsColumns({
       cell: ({ row }) => row.original.totalReached,
     },
     {
+      id: "nReferrals",
+      accessorKey: "nReferrals",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Total Referrals" />
+      ),
+      cell: ({ row }) => row.original.nReferrals,
+    },
+    {
       id: "durationMin",
       accessorKey: "durationMin",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Duration" />
       ),
       cell: ({ row }) => `${row.original.durationMin} min`,
+    },
+    {
+      id: "keyIssues",
+      accessorFn: (row) => row.keyIssues ?? "",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Notes" />
+      ),
+      cell: ({ row }) => {
+        const notes = row.original.keyIssues?.trim();
+        if (!notes) {
+          return <span className="text-muted-foreground">—</span>;
+        }
+        return (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="line-clamp-1 max-w-[200px] truncate text-sm">
+                {notes}
+              </span>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-sm">
+              {notes}
+            </TooltipContent>
+          </Tooltip>
+        );
+      },
     },
   );
 

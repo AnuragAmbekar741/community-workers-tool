@@ -1,7 +1,8 @@
 import axios from "axios";
 
-import { clearAuthToken, getAuthToken } from "@/lib/auth-token";
 import { toApiError } from "@/lib/api-error";
+import { onUnauthorized } from "@/lib/auth-unauthorized";
+import { getAuthToken } from "@/lib/auth-token";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? "/api",
@@ -22,7 +23,7 @@ api.interceptors.response.use(
     if (axios.isAxiosError(error) && error.response?.status === 401) {
       const url = error.config?.url ?? "";
       if (!url.endsWith("/auth/login")) {
-        clearAuthToken();
+        onUnauthorized();
       }
     }
     return Promise.reject(toApiError(error));

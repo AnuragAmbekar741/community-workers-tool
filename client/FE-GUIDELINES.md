@@ -360,8 +360,9 @@ JWT is stored in **localStorage** (`auth_token:v1`) and attached via an axios re
 
 ```typescript
 import axios from "axios";
-import { clearAuthToken, getAuthToken } from "@/lib/auth-token";
 import { toApiError } from "@/lib/api-error";
+import { onUnauthorized } from "@/lib/auth-unauthorized";
+import { getAuthToken } from "@/lib/auth-token";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? "/api",
@@ -382,7 +383,7 @@ api.interceptors.response.use(
     if (axios.isAxiosError(error) && error.response?.status === 401) {
       const url = error.config?.url ?? "";
       if (!url.endsWith("/auth/login")) {
-        clearAuthToken();
+        onUnauthorized();
       }
     }
     return Promise.reject(toApiError(error));
@@ -390,8 +391,24 @@ api.interceptors.response.use(
 );
 ```
 
-- Dev: Vite proxies `/api` → `http://localhost:3000`
-- Production: `VITE_API_BASE_URL` may point directly at Render (cross-origin OK with Bearer)
+Register the unauthorized handler once at app boot in `main.tsx` (before render):
+
+```typescript
+import { meKeys } from "@/hooks/use-me";
+import { clearAuthToken } from "@/lib/auth-token";
+import { registerUnauthorizedHandler } from "@/lib/auth-unauthorized";
+
+registerUnauthorizedHandler(() => {
+  clearAuthToken();
+  queryClient.removeQueries({ queryKey: meKeys.all });
+  window.location.assign("/login");
+});
+```
+
+This clears the JWT, drops the cached `me` query, and redirects to `/login` so the sidebar does not show a stale user after token expiry.
+
+- Dev: Vite proxies `/api` → `http://localhost:3000` (no `VITE_API_BASE_URL` needed)
+- Production: set `VITE_API_BASE_URL` to the deployed API (e.g. `https://community-workers-tool.onrender.com/api`); ensure the server's `CORS_ORIGINS` includes the client origin
 - Auth state: `GET /me` via `useMe()` — 200 = logged in, 401 = not
 - Logout: clear token from localStorage, `POST /auth/logout`, invalidate `me` query cache
 

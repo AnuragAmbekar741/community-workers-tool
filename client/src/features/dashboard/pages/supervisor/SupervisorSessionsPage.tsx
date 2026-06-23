@@ -1,42 +1,37 @@
-import { useMemo, useState } from "react";
-import type { RowSelectionState } from "@tanstack/react-table";
+import { useState } from "react";
 
 import { DataTablePage } from "@/components/data-table/data-table-page";
 import { SessionDetailSheet } from "@/features/dashboard/components/SessionDetailSheet";
 import { SessionsDataTable } from "@/features/dashboard/components/SessionsDataTable";
+import { SessionsLoadError } from "@/features/dashboard/components/SessionsLoadError";
+import { useSessionTableFilters } from "@/hooks/use-session-table-filters";
 import { useSupervisorSessions } from "@/hooks/use-supervisor-sessions";
-import { DISTRICT_OPTIONS } from "@/lib/constants";
-import { isApiError } from "@/lib/api-error";
-import { getOptionLabel } from "@/lib/option-label";
-import type { SessionDistrictFilter } from "@/types/session";
 
 export function SupervisorSessionsPage() {
-  const [districtFilter, setDistrictFilter] =
-    useState<SessionDistrictFilter>("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(
     null,
   );
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const { data, isLoading, isError, error } = useSupervisorSessions();
+  const { data, isLoading, isError, error, refetch } = useSupervisorSessions();
   const sessions = data?.sessions ?? [];
 
-  const emptyMessage = useMemo(() => {
-    if (districtFilter === "all") {
-      return "No sessions found for workers in your organisation.";
-    }
-
-    const districtLabel = getOptionLabel(DISTRICT_OPTIONS, districtFilter);
-    return `No sessions in ${districtLabel}.`;
-  }, [districtFilter]);
-
-  function handleDistrictFilterChange(value: SessionDistrictFilter) {
-    setDistrictFilter(value);
-    setRowSelection({});
-    setSearchQuery("");
-  }
+  const {
+    districtFilter,
+    workerFilter,
+    topicFilter,
+    searchQuery,
+    rowSelection,
+    emptyMessage,
+    setSearchQuery,
+    setRowSelection,
+    handleDistrictFilterChange,
+    handleWorkerFilterChange,
+    handleTopicFilterChange,
+  } = useSessionTableFilters({
+    sessions,
+    defaultEmptyMessage: "No sessions found for workers in your organisation.",
+  });
 
   function handleSessionOpen(sessionId: string) {
     setSelectedSessionId(sessionId);
@@ -63,14 +58,7 @@ export function SupervisorSessionsPage() {
   if (isError) {
     return (
       <DataTablePage bleed>
-        <div
-          className="mx-4 rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-base text-destructive md:mx-6"
-          role="alert"
-        >
-          {isApiError(error)
-            ? error.message
-            : "Could not load sessions. Please try again."}
-        </div>
+        <SessionsLoadError error={error} onRetry={() => void refetch()} />
       </DataTablePage>
     );
   }
@@ -82,6 +70,10 @@ export function SupervisorSessionsPage() {
         emptyMessage={emptyMessage}
         districtFilter={districtFilter}
         onDistrictFilterChange={handleDistrictFilterChange}
+        workerFilter={workerFilter}
+        onWorkerFilterChange={handleWorkerFilterChange}
+        topicFilter={topicFilter}
+        onTopicFilterChange={handleTopicFilterChange}
         searchQuery={searchQuery}
         onSearchQueryChange={setSearchQuery}
         rowSelection={rowSelection}
