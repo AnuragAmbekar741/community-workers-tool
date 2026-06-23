@@ -4,8 +4,6 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
-  Line,
-  LineChart,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -29,6 +27,14 @@ import {
   REACH_DISTRIBUTION_LABELS,
 } from "./analytics-utils";
 import { ChartEmptyState } from "./ChartEmptyState";
+
+const VERTICAL_BAR_CHART_MARGIN = { top: 8, right: 16, left: 0, bottom: 0 };
+
+const COUNT_Y_AXIS_PROPS = {
+  allowDecimals: false,
+  domain: [0, "dataMax"] as [number, string],
+  tick: { fontSize: 12 },
+};
 
 type AnalyticsChartsProps = {
   data: AnalyticsResponse;
@@ -54,10 +60,10 @@ function ReachByMonthChart({
 
   return (
     <ResponsiveContainer width="100%" height={240}>
-      <BarChart data={chartData}>
+      <BarChart data={chartData} margin={VERTICAL_BAR_CHART_MARGIN}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="label" tick={{ fontSize: 12 }} />
-        <YAxis tick={{ fontSize: 12 }} />
+        <YAxis {...COUNT_Y_AXIS_PROPS} />
         <Tooltip />
         <Bar dataKey="totalReached" fill="hsl(var(--primary))" name="Reached" />
       </BarChart>
@@ -88,9 +94,18 @@ function SessionsByTopicChart({
 
   return (
     <ResponsiveContainer width="100%" height={Math.max(240, chartData.length * 28)}>
-      <BarChart data={chartData} layout="vertical" margin={{ left: 8, right: 16 }}>
+      <BarChart
+        data={chartData}
+        layout="vertical"
+        margin={{ top: 8, left: 8, right: 16, bottom: 0 }}
+      >
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis type="number" tick={{ fontSize: 12 }} />
+        <XAxis
+          type="number"
+          allowDecimals={false}
+          domain={[0, "dataMax"]}
+          tick={{ fontSize: 12 }}
+        />
         <YAxis
           type="category"
           dataKey="label"
@@ -174,19 +189,13 @@ function SessionsByMonthChart({
 
   return (
     <ResponsiveContainer width="100%" height={240}>
-      <LineChart data={chartData}>
+      <BarChart data={chartData} margin={VERTICAL_BAR_CHART_MARGIN}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="label" tick={{ fontSize: 12 }} />
-        <YAxis tick={{ fontSize: 12 }} />
+        <YAxis {...COUNT_Y_AXIS_PROPS} />
         <Tooltip />
-        <Line
-          type="monotone"
-          dataKey="sessions"
-          stroke="hsl(var(--primary))"
-          strokeWidth={2}
-          name="Sessions"
-        />
-      </LineChart>
+        <Bar dataKey="sessions" fill="hsl(var(--primary))" name="Sessions" />
+      </BarChart>
     </ResponsiveContainer>
   );
 }
@@ -211,10 +220,10 @@ function ReferralsByMonthChart({
 
   return (
     <ResponsiveContainer width="100%" height={240}>
-      <BarChart data={chartData}>
+      <BarChart data={chartData} margin={VERTICAL_BAR_CHART_MARGIN}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="label" tick={{ fontSize: 12 }} />
-        <YAxis tick={{ fontSize: 12 }} />
+        <YAxis {...COUNT_Y_AXIS_PROPS} />
         <Tooltip />
         <Bar dataKey="referrals" fill="hsl(var(--primary))" name="Referrals" />
       </BarChart>
