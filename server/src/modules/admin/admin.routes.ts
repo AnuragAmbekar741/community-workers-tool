@@ -9,6 +9,7 @@ import {
   approveWorker,
   assignWorker,
   deleteSession,
+  getSession,
   listSessions,
   listWorkers,
   updateSession,
@@ -33,6 +34,11 @@ adminRouter.patch(
   asyncHandler(assignWorker),
 );
 adminRouter.get("/sessions", asyncHandler(listSessions));
+adminRouter.get(
+  "/sessions/:id",
+  validate(sessionParamsSchema),
+  asyncHandler(getSession),
+);
 adminRouter.patch(
   "/sessions/:id",
   validate(updateSessionSchema),

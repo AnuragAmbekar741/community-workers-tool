@@ -16,6 +16,7 @@ type SessionsDataTableProps = {
   onSearchQueryChange: (value: string) => void;
   rowSelection: RowSelectionState;
   onRowSelectionChange: OnChangeFn<RowSelectionState>;
+  sessionDetailPath?: (sessionId: string) => string;
 };
 
 export function SessionsDataTable({
@@ -27,10 +28,11 @@ export function SessionsDataTable({
   onSearchQueryChange,
   rowSelection,
   onRowSelectionChange,
+  sessionDetailPath,
 }: SessionsDataTableProps) {
   const columns = useMemo(
-    () => getSessionsColumns({ enableSelection: true }),
-    [],
+    () => getSessionsColumns({ enableSelection: true, sessionDetailPath }),
+    [sessionDetailPath],
   );
 
   const filteredSessions = useMemo(() => {

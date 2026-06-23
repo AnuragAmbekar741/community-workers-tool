@@ -69,6 +69,7 @@ export function AdminSessionsPage() {
         onSearchQueryChange={setSearchQuery}
         rowSelection={rowSelection}
         onRowSelectionChange={setRowSelection}
+        sessionDetailPath={(id) => `/admin/sessions/${id}`}
       />
     </DataTablePage>
   );

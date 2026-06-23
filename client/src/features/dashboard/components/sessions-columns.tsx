@@ -1,4 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
+import { Link } from "react-router-dom";
 
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { getDataTableRowSelectColumn } from "@/components/data-table/data-table-row-select-column";
@@ -12,10 +13,12 @@ import type { SessionDto } from "@/types/session";
 
 type GetSessionsColumnsOptions = {
   enableSelection: boolean;
+  sessionDetailPath?: (sessionId: string) => string;
 };
 
 export function getSessionsColumns({
   enableSelection,
+  sessionDetailPath,
 }: GetSessionsColumnsOptions): ColumnDef<SessionDto>[] {
   const columns: ColumnDef<SessionDto>[] = [];
 
@@ -30,9 +33,20 @@ export function getSessionsColumns({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Session ID" />
       ),
-      cell: ({ row }) => (
-        <span className="font-medium">{row.original.sessionId}</span>
-      ),
+      cell: ({ row }) => {
+        const sessionId = row.original.sessionId;
+        if (sessionDetailPath) {
+          return (
+            <Link
+              to={sessionDetailPath(sessionId)}
+              className="font-medium text-primary hover:underline"
+            >
+              {sessionId}
+            </Link>
+          );
+        }
+        return <span className="font-medium">{sessionId}</span>;
+      },
     },
     {
       id: "workerId",

@@ -272,6 +272,14 @@
           }
         },
         {
+          "name": "GET Session By ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/admin/sessions/{{sessionId}}"
+          }
+        },
+        {
           "name": "PATCH Update Session",
           "request": {
             "method": "PATCH",
@@ -313,6 +321,14 @@
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{supervisorToken}}" }],
             "url": "{{baseUrl}}/supervisor/sessions"
+          }
+        },
+        {
+          "name": "GET Session By ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{supervisorToken}}" }],
+            "url": "{{baseUrl}}/supervisor/sessions/{{sessionId}}"
           }
         },
         {

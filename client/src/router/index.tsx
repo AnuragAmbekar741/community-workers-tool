@@ -3,10 +3,12 @@ import { createBrowserRouter, Outlet } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DashboardLayout } from "@/features/dashboard/layout/DashboardLayout";
 import { AdminOverviewPage } from "@/features/dashboard/pages/admin/AdminOverviewPage";
+import { AdminSessionDetailPage } from "@/features/dashboard/pages/admin/AdminSessionDetailPage";
 import { AdminSessionsPage } from "@/features/dashboard/pages/admin/AdminSessionsPage";
 import { AdminWorkersPage } from "@/features/dashboard/pages/admin/AdminWorkersPage";
 import { SupervisorAnalyticsPage } from "@/features/dashboard/pages/supervisor/SupervisorAnalyticsPage";
 import { SupervisorOverviewPage } from "@/features/dashboard/pages/supervisor/SupervisorOverviewPage";
+import { SupervisorSessionDetailPage } from "@/features/dashboard/pages/supervisor/SupervisorSessionDetailPage";
 import { SupervisorSessionsPage } from "@/features/dashboard/pages/supervisor/SupervisorSessionsPage";
 import { SupervisorWorkersPage } from "@/features/dashboard/pages/supervisor/SupervisorWorkersPage";
 import { AuthLoginStubPage } from "@/features/auth-login/AuthLoginStubPage";
@@ -62,6 +64,7 @@ export const router = createBrowserRouter([
           { index: true, element: <SupervisorOverviewPage /> },
           { path: "workers", element: <SupervisorWorkersPage /> },
           { path: "sessions", element: <SupervisorSessionsPage /> },
+          { path: "sessions/:id", element: <SupervisorSessionDetailPage /> },
           { path: "analytics", element: <SupervisorAnalyticsPage /> },
         ],
       },
@@ -76,6 +79,7 @@ export const router = createBrowserRouter([
           { index: true, element: <AdminOverviewPage /> },
           { path: "workers", element: <AdminWorkersPage /> },
           { path: "sessions", element: <AdminSessionsPage /> },
+          { path: "sessions/:id", element: <AdminSessionDetailPage /> },
         ],
       },
       { path: "*", element: <NotFoundPage /> },

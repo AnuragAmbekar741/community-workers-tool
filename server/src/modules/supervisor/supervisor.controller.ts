@@ -44,6 +44,13 @@ export async function listSessions(req: Request, res: Response) {
   res.status(200).json(result);
 }
 
+export async function getSession(req: Request, res: Response) {
+  const supervisorId = req.user!.userId;
+  const { id } = req.params as SessionParams;
+  const result = await sessionsService.getForSupervisorOrg(supervisorId, id);
+  res.status(200).json(result);
+}
+
 export async function updateSession(req: Request, res: Response) {
   const supervisorId = req.user!.userId;
   const { id } = req.params as SessionParams;

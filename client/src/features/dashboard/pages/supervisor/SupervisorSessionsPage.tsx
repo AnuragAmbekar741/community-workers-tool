@@ -69,6 +69,7 @@ export function SupervisorSessionsPage() {
         onSearchQueryChange={setSearchQuery}
         rowSelection={rowSelection}
         onRowSelectionChange={setRowSelection}
+        sessionDetailPath={(id) => `/supervisor/sessions/${id}`}
       />
     </DataTablePage>
   );

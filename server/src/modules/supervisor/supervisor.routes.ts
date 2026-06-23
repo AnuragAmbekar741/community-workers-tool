@@ -11,6 +11,7 @@ import {
   deleteSession,
   exportPdf,
   getAnalytics,
+  getSession,
   listSessions,
   listWorkers,
   updateSession,
@@ -33,6 +34,11 @@ supervisorRouter.patch(
   asyncHandler(approveWorker),
 );
 supervisorRouter.get("/sessions", asyncHandler(listSessions));
+supervisorRouter.get(
+  "/sessions/:id",
+  validate(sessionParamsSchema),
+  asyncHandler(getSession),
+);
 supervisorRouter.patch(
   "/sessions/:id",
   validate(updateSessionSchema),

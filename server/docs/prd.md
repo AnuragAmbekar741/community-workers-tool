@@ -129,6 +129,7 @@ SEEDED                         WORKER SELF-SERVE FLOW
 | ------ | ------------------------ | ------ | ------------------------------------ |
 | GET    | `/supervisor/workers`    | 🧑‍🏫     | List own assigned workers (ids)      |
 | GET    | `/supervisor/sessions`   | 🧑‍🏫     | Sessions across own workers          |
+| GET    | `/supervisor/sessions/:id` | 🧑‍🏫   | Single session (org-scoped)          |
 | GET    | `/supervisor/analytics`  | 🧑‍🏫     | Aggregated analytics for own workers |
 | GET    | `/supervisor/export.pdf` | 🧑‍🏫     | Download own workers' data as PDF    |
 
@@ -140,6 +141,7 @@ SEEDED                         WORKER SELF-SERVE FLOW
 | PATCH  | `/admin/workers/:id/approve` | 🛡️     | Approve (or reject) a worker      |
 | PATCH  | `/admin/workers/:id/assign`  | 🛡️     | Assign / reassign to a supervisor |
 | GET    | `/admin/sessions`            | 🛡️     | All sessions across all workers   |
+| GET    | `/admin/sessions/:id`        | 🛡️     | Single session by ID              |
 | PATCH  | `/admin/sessions/:id`        | 🛡️     | Edit any session                  |
 | DELETE | `/admin/sessions/:id`        | 🛡️     | Delete any session                |
 

@@ -41,6 +41,12 @@ export async function listSessions(_req: Request, res: Response) {
   res.status(200).json(result);
 }
 
+export async function getSession(req: Request, res: Response) {
+  const { id } = req.params as SessionParams;
+  const result = await sessionsService.getAny(id);
+  res.status(200).json(result);
+}
+
 export async function updateSession(req: Request, res: Response) {
   const { id } = req.params as SessionParams;
   const body = req.body as UpdateSessionBody;

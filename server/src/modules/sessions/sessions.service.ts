@@ -171,6 +171,23 @@ export class SessionsService {
     await this.sessionsRepo.delete(sessionId);
   }
 
+  async getForSupervisorOrg(
+    supervisorId: string,
+    sessionId: string,
+  ): Promise<{ session: Session }> {
+    const session = await this.getSessionOrThrow(sessionId);
+    await this.workersService.assertWorkerInSupervisorOrg(
+      supervisorId,
+      session.workerId,
+    );
+    return { session };
+  }
+
+  async getAny(sessionId: string): Promise<{ session: Session }> {
+    const session = await this.getSessionOrThrow(sessionId);
+    return { session };
+  }
+
   async getAnalytics(
     supervisorId: string,
     filters: AnalyticsFilters = {},

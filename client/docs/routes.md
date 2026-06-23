@@ -20,10 +20,12 @@ URL map, auth guards, and feature folder mapping for the client app. Implement w
 | `/supervisor` | Supervisor overview | JWT | `supervisor` |
 | `/supervisor/workers` | Assigned workers | JWT | `supervisor` |
 | `/supervisor/sessions` | Worker sessions | JWT | `supervisor` |
+| `/supervisor/sessions/:id` | Session detail (read-only) | JWT | `supervisor` + org scope |
 | `/supervisor/analytics` | Analytics | JWT | `supervisor` |
 | `/admin` | Admin overview | JWT | `admin` |
 | `/admin/workers` | Worker approval | JWT | `admin` |
-| `/admin/sessions` | All sessions (stub) | JWT | `admin` |
+| `/admin/sessions` | All sessions | JWT | `admin` |
+| `/admin/sessions/:id` | Session detail (read-only) | JWT | `admin` |
 
 ---
 
@@ -79,8 +81,8 @@ Per [FE-GUIDELINES](../FE-GUIDELINES.md), map routes to `src/features/`:
 | `/login` | `src/features/auth-login/` |
 | `/worker` | `src/features/worker-home/` |
 | `/worker/sessions`, `/worker/sessions/new`, `/worker/sessions/:id` | `src/features/worker-sessions/` |
-| `/supervisor`, `/supervisor/workers`, `/supervisor/sessions`, `/supervisor/analytics` | `src/features/dashboard/pages/supervisor/` |
-| `/admin`, `/admin/workers`, `/admin/sessions` | `src/features/dashboard/pages/admin/` |
+| `/supervisor`, `/supervisor/workers`, `/supervisor/sessions`, `/supervisor/sessions/:id`, `/supervisor/analytics` | `src/features/dashboard/pages/supervisor/` |
+| `/admin`, `/admin/workers`, `/admin/sessions`, `/admin/sessions/:id` | `src/features/dashboard/pages/admin/` |
 
 Shared dashboard shell (sidebar, header, nav): `src/features/dashboard/layout/`
 

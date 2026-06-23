@@ -3,7 +3,7 @@ import type {
   ListWorkersResponse,
   WorkerStatusFilter,
 } from "@/types/admin";
-import type { ListSessionsResponse } from "@/types/session";
+import type { GetSessionResponse, ListSessionsResponse } from "@/types/session";
 
 import { api } from "./client";
 
@@ -29,5 +29,14 @@ export async function approveWorker(
 
 export async function listSessions(): Promise<ListSessionsResponse> {
   const { data } = await api.get<ListSessionsResponse>("/admin/sessions");
+  return data;
+}
+
+export async function getSession(
+  sessionId: string,
+): Promise<GetSessionResponse> {
+  const { data } = await api.get<GetSessionResponse>(
+    `/admin/sessions/${sessionId}`,
+  );
   return data;
 }

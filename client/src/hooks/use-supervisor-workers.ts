@@ -8,6 +8,7 @@ export const supervisorKeys = {
   workers: (status?: WorkerStatusFilter) =>
     [...supervisorKeys.all, "workers", status ?? "all"] as const,
   sessions: () => [...supervisorKeys.all, "sessions"] as const,
+  session: (id: string) => [...supervisorKeys.all, "sessions", id] as const,
 };
 
 export function useSupervisorWorkers(status?: WorkerStatusFilter) {

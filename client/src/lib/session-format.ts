@@ -8,7 +8,7 @@ export function formatSessionDate(date: string): string {
     return date;
   }
 
-  return new Date(year, month - 1, day).toLocaleDateString(undefined, {
+  return new Date(year, month - 1, day).toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",
     year: "numeric",
