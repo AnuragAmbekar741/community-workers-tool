@@ -86,7 +86,7 @@
 | education    | none, primary, junior_sec, senior_sec, vocational, diploma, bachelors, postgrad                                           |
 | village      | village_a, village_b, village_c, village_d, village_e _(finalise before launch)_                                          |
 | district     | See [District values](#district-values) below                                                                               |
-| topic        | adolescence_youth_risk, puberty_body_changes, srh, relationships_gender_norms, consent_gbv, safeguarding_reporting, other |
+| topic        | adolescence_youth_risk, puberty_body_changes, srh, relationships_gender_norms, consent_gbv, safeguarding_reporting, human_body_changes, puberty, menstruation, hiv_sti_prevention, reproduction_contraceptives, relationships, power_consent, gender, violence, other |
 
 ### District values
 

@@ -183,7 +183,7 @@ Primary worker hub.
 
 - Greeting + worker name
 - Primary CTA: **Add new session** (`h-11`)
-- **Previous sessions** list — compact cards showing date, village, topic, total reached
+- **Previous sessions** list — compact cards showing date, district, topic, total reached
 - Link to full list: "View all sessions"
 
 **Actions**
@@ -219,11 +219,14 @@ Primary worker hub.
 | Field | Type | Validation |
 | --- | --- | --- |
 | sessionDate | date | `YYYY-MM-DD`, not in future |
-| village | select | must be in worker's `villages` |
+| district | select | server `district` enum |
 | topic | select | server enum |
 | topicOther | text | required when topic is `other` |
 | durationMin | number | 10–300 minutes |
 | nWomen, nMen, nGirls, nBoys, nElders, nOthers | number | min 0; at least one must be > 0 |
+| referralsMade | yes/no | required |
+| nReferrals | number | required when referrals made; 0 otherwise |
+| referralReason | text | required when referrals made |
 | keyIssues | textarea | optional |
 
 **Actions**
@@ -251,7 +254,7 @@ Primary worker hub.
 **Layout**
 
 - Scrollable list of session cards (same pattern as worker home)
-- Each card: date, village, topic, total reached
+- Each card: date, district, topic, total reached
 
 **Actions**
 

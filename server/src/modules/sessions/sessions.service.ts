@@ -1,3 +1,4 @@
+import type { WorkerStatus } from "../../constants/index.js";
 import { ForbiddenError, NotFoundError, ValidationError } from "../../lib/errors.js";
 import { nextSessionIdFromMax } from "../../lib/id-generator.js";
 import {
@@ -15,6 +16,42 @@ import {
 } from "./sessions.repository.js";
 import type { CreateSessionBody, UpdateSessionBody } from "./sessions.schema.js";
 
+export interface SupervisorAnalyticsWorkerRow {
+  workerId: string;
+  district: string;
+  totalSessions: number;
+  topicsCovered: string[];
+  totalReach: number;
+  totalReferred: number;
+  status: WorkerStatus;
+  lastSessionLog: string | null;
+}
+
+export interface SupervisorAnalyticsResponse {
+  topBox: {
+    totalSessions: number;
+    totalReached: number;
+    activeWorkers: number;
+    totalWorkers: number;
+    districtsCovered: number;
+  };
+  reachByMonth: Array<{ month: string; totalReached: number }>;
+  sessionsByTopic: Record<string, number>;
+  reachDistribution: {
+    nWomen: number;
+    nMen: number;
+    nGirls: number;
+    nBoys: number;
+    nElders: number;
+    nOthers: number;
+  };
+  sessionsByMonth: Array<{ month: string; sessions: number }>;
+  referralsByMonth: Array<{ month: string; referrals: number }>;
+  recentSubmissions: Session[];
+  workerTable: SupervisorAnalyticsWorkerRow[];
+}
+
+/** @deprecated Use SupervisorAnalyticsResponse */
 export interface SupervisorAnalytics {
   totalSessions: number;
   totalReached: number;
@@ -191,37 +228,96 @@ export class SessionsService {
   async getAnalytics(
     supervisorId: string,
     filters: AnalyticsFilters = {},
-  ): Promise<SupervisorAnalytics> {
+  ): Promise<SupervisorAnalyticsResponse> {
     const workerIds = await this.getSupervisorOrgWorkerIds(supervisorId);
-    const rows = await this.sessionsRepo.aggregateByWorkerIds(workerIds, filters);
+    const totalWorkers = workerIds.length;
 
-    const analytics: SupervisorAnalytics = {
-      totalSessions: 0,
-      totalReached: 0,
-      byTopic: {},
-      byDistrict: {},
-      byWorker: {},
+    const chartFilters: AnalyticsFilters = {
+      from: filters.from,
+      to: filters.to,
+      district: filters.district,
+      workerId: filters.workerId,
+      topic: filters.topic,
     };
 
-    for (const row of rows) {
-      analytics.totalSessions += row.sessionCount;
-      analytics.totalReached += row.totalReached;
+    const workerTableFilters: AnalyticsFilters = {
+      ...chartFilters,
+      workerMonth: filters.workerMonth,
+    };
 
-      analytics.byTopic[row.topic] =
-        (analytics.byTopic[row.topic] ?? 0) + row.sessionCount;
-      analytics.byDistrict[row.district] =
-        (analytics.byDistrict[row.district] ?? 0) + row.sessionCount;
+    const activeSince = new Date();
+    activeSince.setDate(activeSince.getDate() - 30);
+    const activeSinceStr = activeSince.toISOString().slice(0, 10);
 
-      const workerStats = analytics.byWorker[row.workerId] ?? {
-        sessions: 0,
-        totalReached: 0,
-      };
-      workerStats.sessions += row.sessionCount;
-      workerStats.totalReached += row.totalReached;
-      analytics.byWorker[row.workerId] = workerStats;
-    }
+    const [
+      totals,
+      monthly,
+      sessionsByTopic,
+      reachDistribution,
+      districtsCovered,
+      activeWorkers,
+      recentSubmissions,
+      workerStats,
+    ] = await Promise.all([
+      this.sessionsRepo.sumSessionTotals(workerIds, chartFilters),
+      this.sessionsRepo.aggregateByMonth(workerIds, chartFilters),
+      this.sessionsRepo.aggregateByTopic(workerIds, chartFilters),
+      this.sessionsRepo.aggregateReachDistribution(workerIds, chartFilters),
+      this.sessionsRepo.countDistinctDistricts(workerIds, chartFilters),
+      this.sessionsRepo.countActiveWorkers(workerIds, activeSinceStr),
+      this.sessionsRepo.findRecentSessions(workerIds, chartFilters, 10),
+      this.sessionsRepo.aggregateWorkerStats(workerIds, workerTableFilters),
+    ]);
 
-    return analytics;
+    const statsByWorkerId = new Map(
+      workerStats.map((row) => [row.workerId, row]),
+    );
+
+    const workerTable: SupervisorAnalyticsWorkerRow[] = await Promise.all(
+      workerIds.map(async (workerId) => {
+        const worker = await this.workersService.findById(workerId);
+        const stats = statsByWorkerId.get(workerId);
+
+        return {
+          workerId,
+          district: worker.district,
+          totalSessions: stats?.totalSessions ?? 0,
+          topicsCovered: stats?.topicsCovered ?? [],
+          totalReach: stats?.totalReach ?? 0,
+          totalReferred: stats?.totalReferred ?? 0,
+          status: worker.status as WorkerStatus,
+          lastSessionLog: stats?.lastSessionLog ?? null,
+        };
+      }),
+    );
+
+    workerTable.sort((a, b) => a.workerId.localeCompare(b.workerId));
+
+    return {
+      topBox: {
+        totalSessions: totals.totalSessions,
+        totalReached: totals.totalReached,
+        activeWorkers,
+        totalWorkers,
+        districtsCovered,
+      },
+      reachByMonth: monthly.map((row) => ({
+        month: row.month,
+        totalReached: row.totalReached,
+      })),
+      sessionsByTopic,
+      reachDistribution,
+      sessionsByMonth: monthly.map((row) => ({
+        month: row.month,
+        sessions: row.sessions,
+      })),
+      referralsByMonth: monthly.map((row) => ({
+        month: row.month,
+        referrals: row.referrals,
+      })),
+      recentSubmissions,
+      workerTable,
+    };
   }
 
   async getExportData(supervisorId: string): Promise<SessionExportData> {

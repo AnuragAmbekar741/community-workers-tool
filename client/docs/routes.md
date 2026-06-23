@@ -20,7 +20,7 @@ URL map, auth guards, and feature folder mapping for the client app. Implement w
 | `/supervisor` | Supervisor overview | JWT | `supervisor` |
 | `/supervisor/workers` | Assigned workers | JWT | `supervisor` |
 | `/supervisor/sessions` | Worker sessions (detail in Sheet) | JWT | `supervisor` |
-| `/supervisor/analytics` | Analytics | JWT | `supervisor` |
+| `/supervisor/analytics` | Analytics dashboard (stat cards, charts, recent submissions, worker table) | JWT | `supervisor` |
 | `/admin` | Admin overview | JWT | `admin` |
 | `/admin/workers` | Worker approval | JWT | `admin` |
 | `/admin/sessions` | All sessions (detail in Sheet) | JWT | `admin` |
@@ -47,9 +47,7 @@ URL map, auth guards, and feature folder mapping for the client app. Implement w
 
 ### Token expiry (401)
 
-- Clear JWT from localStorage (axios 401 interceptor also clears on expired token)
-- Invalidate React Query `me` cache
-- Redirect to `/login`
+- `onUnauthorized()` handler clears JWT, invalidates React Query `me` cache, and redirects to `/login`
 
 ### Own-session check
 

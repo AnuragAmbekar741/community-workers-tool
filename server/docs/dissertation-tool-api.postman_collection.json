@@ -337,14 +337,19 @@
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{supervisorToken}}" }],
             "url": {
-              "raw": "{{baseUrl}}/supervisor/analytics?from=2026-01-01&to=2026-12-31",
+              "raw": "{{baseUrl}}/supervisor/analytics?from=2026-01-01&to=2026-12-31&district=gaborone&workerId=CW0001&topic=srh&workerMonth=2026-06",
               "host": ["{{baseUrl}}"],
               "path": ["supervisor", "analytics"],
               "query": [
                 { "key": "from", "value": "2026-01-01", "disabled": true },
-                { "key": "to", "value": "2026-12-31", "disabled": true }
+                { "key": "to", "value": "2026-12-31", "disabled": true },
+                { "key": "district", "value": "gaborone", "disabled": true },
+                { "key": "workerId", "value": "CW0001", "disabled": true },
+                { "key": "topic", "value": "srh", "disabled": true },
+                { "key": "workerMonth", "value": "2026-06", "disabled": true }
               ]
-            }
+            },
+            "description": "Returns topBox, reachByMonth, sessionsByTopic, reachDistribution, sessionsByMonth, referralsByMonth, recentSubmissions, workerTable."
           }
         },
         {

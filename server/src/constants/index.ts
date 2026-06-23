@@ -72,6 +72,15 @@ export const TOPIC = [
   "relationships_gender_norms",
   "consent_gbv",
   "safeguarding_reporting",
+  "human_body_changes",
+  "puberty",
+  "menstruation",
+  "hiv_sti_prevention",
+  "reproduction_contraceptives",
+  "relationships",
+  "power_consent",
+  "gender",
+  "violence",
   "other",
 ] as const;
 export type Topic = (typeof TOPIC)[number];
