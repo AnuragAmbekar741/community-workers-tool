@@ -2,6 +2,7 @@ import { Router } from "express";
 import { asyncHandler } from "../../lib/async-handler.js";
 import { validate } from "../../middleware/validate.js";
 import {
+  analyticsQuerySchema,
   sessionParamsSchema,
   updateSessionSchema,
 } from "../sessions/sessions.schema.js";
@@ -9,6 +10,7 @@ import {
   approveWorker,
   assignWorker,
   deleteSession,
+  getAnalytics,
   getSession,
   listSessions,
   listWorkers,
@@ -34,6 +36,11 @@ adminRouter.patch(
   asyncHandler(assignWorker),
 );
 adminRouter.get("/sessions", asyncHandler(listSessions));
+adminRouter.get(
+  "/analytics",
+  validate(analyticsQuerySchema),
+  asyncHandler(getAnalytics),
+);
 adminRouter.get(
   "/sessions/:id",
   validate(sessionParamsSchema),

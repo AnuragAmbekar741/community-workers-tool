@@ -3,7 +3,7 @@ import type {
   ListWorkersResponse,
   WorkerStatusFilter,
 } from "@/types/admin";
-import type { AnalyticsFilters, SupervisorAnalyticsResponse } from "@/types/analytics";
+import type { AnalyticsFilters, AnalyticsResponse } from "@/types/analytics";
 import type {
   CreateSessionRequest,
   GetSessionResponse,
@@ -63,8 +63,8 @@ export async function deleteSession(sessionId: string): Promise<void> {
 
 export async function getAnalytics(
   filters: AnalyticsFilters = {},
-): Promise<SupervisorAnalyticsResponse> {
-  const { data } = await api.get<SupervisorAnalyticsResponse>(
+): Promise<AnalyticsResponse> {
+  const { data } = await api.get<AnalyticsResponse>(
     "/supervisor/analytics",
     { params: filters },
   );

@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { SessionsService } from "../sessions/sessions.service.js";
 import type {
+  AnalyticsQuery,
   SessionParams,
   UpdateSessionBody,
 } from "../sessions/sessions.schema.js";
@@ -58,4 +59,10 @@ export async function deleteSession(req: Request, res: Response) {
   const { id } = req.params as SessionParams;
   await sessionsService.deleteAny(id);
   res.status(204).send();
+}
+
+export async function getAnalytics(req: Request, res: Response) {
+  const query = req.query as AnalyticsQuery;
+  const result = await sessionsService.getAdminAnalytics(query);
+  res.status(200).json(result);
 }

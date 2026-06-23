@@ -1,17 +1,23 @@
 import { lazy, Suspense, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 
+import { Button } from "@/components/base/button";
 import { SessionsLoadError } from "@/features/dashboard/components/SessionsLoadError";
 import { OverviewStatCard } from "@/features/dashboard/components/OverviewStatCard";
+import { useAdminAnalytics } from "@/hooks/use-admin-analytics";
+import { useAdminWorkers } from "@/hooks/use-admin-workers";
+import { useMe } from "@/hooks/use-me";
 import { useSupervisorAnalytics } from "@/hooks/use-supervisor-analytics";
 import { useSupervisorWorkers } from "@/hooks/use-supervisor-workers";
+import { ORGANISATION_OPTIONS } from "@/lib/constants";
 import type { AnalyticsFilters } from "@/types/analytics";
 
-import { AnalyticsFiltersBar } from "../../components/analytics/AnalyticsFiltersBar";
-import { RecentSubmissionsTable } from "../../components/analytics/RecentSubmissionsTable";
-import { WorkerAnalyticsTable } from "../../components/analytics/WorkerAnalyticsTable";
+import { AnalyticsFiltersBar } from "../components/analytics/AnalyticsFiltersBar";
+import { RecentSubmissionsTable } from "../components/analytics/RecentSubmissionsTable";
+import { WorkerAnalyticsTable } from "../components/analytics/WorkerAnalyticsTable";
 
 const AnalyticsCharts = lazy(() =>
-  import("../../components/analytics/AnalyticsCharts").then((module) => ({
+  import("../components/analytics/AnalyticsCharts").then((module) => ({
     default: module.AnalyticsCharts,
   })),
 );
@@ -29,7 +35,11 @@ function ChartSkeleton() {
   );
 }
 
-export function SupervisorAnalyticsPage() {
+type AnalyticsDashboardPageProps = {
+  role: "supervisor" | "admin";
+};
+
+export function AnalyticsDashboardPage({ role }: AnalyticsDashboardPageProps) {
   const [filters, setFilters] = useState<AnalyticsFilters>({});
   const [workerMonth, setWorkerMonth] = useState("all");
 
@@ -41,9 +51,46 @@ export function SupervisorAnalyticsPage() {
     [filters, workerMonth],
   );
 
+  const supervisorQuery = useSupervisorAnalytics(queryFilters, {
+    enabled: role === "supervisor",
+  });
+  const adminQuery = useAdminAnalytics(queryFilters, {
+    enabled: role === "admin",
+  });
+
   const { data, isLoading, isError, error, refetch } =
-    useSupervisorAnalytics(queryFilters);
-  const { data: workersData } = useSupervisorWorkers();
+    role === "supervisor" ? supervisorQuery : adminQuery;
+
+  const { data: user } = useMe();
+  const { data: supervisorWorkersData } = useSupervisorWorkers(undefined, {
+    enabled: role === "supervisor",
+  });
+  const { data: adminWorkersData } = useAdminWorkers(undefined, {
+    enabled: role === "admin",
+  });
+  const { data: pendingSupervisorWorkers } = useSupervisorWorkers("pending", {
+    enabled: role === "supervisor",
+  });
+  const { data: pendingAdminWorkers } = useAdminWorkers("pending", {
+    enabled: role === "admin",
+  });
+
+  const workersData =
+    role === "supervisor" ? supervisorWorkersData : adminWorkersData;
+  const pendingCount =
+    role === "supervisor"
+      ? (pendingSupervisorWorkers?.workers.length ?? 0)
+      : (pendingAdminWorkers?.workers.length ?? 0);
+
+  const sessionsPath =
+    role === "supervisor" ? "/supervisor/sessions" : "/admin/sessions";
+  const workersPath =
+    role === "supervisor" ? "/supervisor/workers" : "/admin/workers";
+
+  const organisationLabel = user?.organisation
+    ? (ORGANISATION_OPTIONS.find((option) => option.value === user.organisation)
+        ?.label ?? user.organisation)
+    : "—";
 
   const workerOptions = useMemo(
     () =>
@@ -87,9 +134,35 @@ export function SupervisorAnalyticsPage() {
 
   return (
     <div className="flex-1 space-y-6 overflow-y-auto">
-      <p className="text-base text-muted-foreground">
-        Aggregated reach and attendance across your workers.
-      </p>
+      <div className="space-y-3">
+        {role === "supervisor" ? (
+          <p className="text-base text-muted-foreground">
+            Aggregated reach for{" "}
+            <span className="font-medium text-foreground">
+              {organisationLabel}
+            </span>{" "}
+            workers in your organisation.
+          </p>
+        ) : (
+          <p className="text-base text-muted-foreground">
+            Aggregated reach and attendance across the programme.
+          </p>
+        )}
+
+        <div className="flex flex-wrap gap-3">
+          <Button asChild className="h-11">
+            <Link to={workersPath}>
+              Review pending workers
+              {pendingCount > 0 ? ` (${pendingCount})` : ""}
+            </Link>
+          </Button>
+          {role === "supervisor" ? (
+            <Button asChild variant="outline" className="h-11">
+              <Link to={sessionsPath}>View sessions</Link>
+            </Button>
+          ) : null}
+        </div>
+      </div>
 
       <AnalyticsFiltersBar
         filters={filters}
@@ -121,10 +194,14 @@ export function SupervisorAnalyticsPage() {
         <AnalyticsCharts data={data} />
       </Suspense>
 
-      <RecentSubmissionsTable sessions={data.recentSubmissions} />
+      <RecentSubmissionsTable
+        sessions={data.recentSubmissions}
+        sessionsPath={sessionsPath}
+      />
 
       <WorkerAnalyticsTable
         workers={data.workerTable}
+        sessionsPath={sessionsPath}
         workerMonth={workerMonth}
         onWorkerMonthChange={setWorkerMonth}
         monthOptions={monthOptions}

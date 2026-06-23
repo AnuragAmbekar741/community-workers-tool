@@ -12,10 +12,12 @@ import type { SessionDto } from "@/types/session";
 
 type RecentSubmissionsTableProps = {
   sessions: SessionDto[];
+  sessionsPath: string;
 };
 
 export function RecentSubmissionsTable({
   sessions,
+  sessionsPath,
 }: RecentSubmissionsTableProps) {
   return (
     <Card>
@@ -24,7 +26,7 @@ export function RecentSubmissionsTable({
           Recent submissions
         </CardTitle>
         <Button asChild variant="outline" size="sm">
-          <Link to="/supervisor/sessions">View all</Link>
+          <Link to={sessionsPath}>View all</Link>
         </Button>
       </CardHeader>
       <CardContent>

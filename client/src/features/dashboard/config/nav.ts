@@ -1,5 +1,4 @@
 import {
-  BarChart3,
   Calendar,
   LayoutDashboard,
   Users,
@@ -31,11 +30,6 @@ const supervisorNav: DashboardNavItem[] = [
     label: "Sessions",
     path: "/supervisor/sessions",
     icon: Calendar,
-  },
-  {
-    label: "Analytics",
-    path: "/supervisor/analytics",
-    icon: BarChart3,
   },
 ];
 

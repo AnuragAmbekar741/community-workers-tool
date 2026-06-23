@@ -11,9 +11,13 @@ export const supervisorKeys = {
   session: (id: string) => [...supervisorKeys.all, "sessions", id] as const,
 };
 
-export function useSupervisorWorkers(status?: WorkerStatusFilter) {
+export function useSupervisorWorkers(
+  status?: WorkerStatusFilter,
+  options?: { enabled?: boolean },
+) {
   return useQuery({
     queryKey: supervisorKeys.workers(status),
     queryFn: () => listWorkers(status),
+    enabled: options?.enabled ?? true,
   });
 }

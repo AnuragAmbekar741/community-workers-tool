@@ -10,7 +10,7 @@ export type AnalyticsFilters = {
   workerMonth?: string;
 };
 
-export type SupervisorAnalyticsWorkerRow = {
+export type AnalyticsWorkerRow = {
   workerId: string;
   district: District;
   totalSessions: number;
@@ -21,7 +21,7 @@ export type SupervisorAnalyticsWorkerRow = {
   lastSessionLog: string | null;
 };
 
-export type SupervisorAnalyticsResponse = {
+export type AnalyticsResponse = {
   topBox: {
     totalSessions: number;
     totalReached: number;
@@ -42,5 +42,11 @@ export type SupervisorAnalyticsResponse = {
   sessionsByMonth: Array<{ month: string; sessions: number }>;
   referralsByMonth: Array<{ month: string; referrals: number }>;
   recentSubmissions: SessionDto[];
-  workerTable: SupervisorAnalyticsWorkerRow[];
+  workerTable: AnalyticsWorkerRow[];
 };
+
+/** @deprecated Use AnalyticsResponse */
+export type SupervisorAnalyticsResponse = AnalyticsResponse;
+
+/** @deprecated Use AnalyticsWorkerRow */
+export type SupervisorAnalyticsWorkerRow = AnalyticsWorkerRow;

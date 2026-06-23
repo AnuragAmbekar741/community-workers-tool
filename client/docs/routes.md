@@ -17,11 +17,11 @@ URL map, auth guards, and feature folder mapping for the client app. Implement w
 | `/worker/sessions` | Session list | JWT | `worker` |
 | `/worker/sessions/new` | New session | JWT | `worker` + approved |
 | `/worker/sessions/:id` | Session detail | JWT | `worker` + own session |
-| `/supervisor` | Supervisor overview | JWT | `supervisor` |
+| `/supervisor` | Analytics dashboard (org-scoped; stat cards, charts, recent submissions, worker table) | JWT | `supervisor` |
 | `/supervisor/workers` | Assigned workers | JWT | `supervisor` |
 | `/supervisor/sessions` | Worker sessions (detail in Sheet) | JWT | `supervisor` |
-| `/supervisor/analytics` | Analytics dashboard (stat cards, charts, recent submissions, worker table) | JWT | `supervisor` |
-| `/admin` | Admin overview | JWT | `admin` |
+| `/supervisor/analytics` | Redirects to `/supervisor` (legacy bookmark) | JWT | `supervisor` |
+| `/admin` | Analytics dashboard (programme-wide; same layout as supervisor) | JWT | `admin` |
 | `/admin/workers` | Worker approval | JWT | `admin` |
 | `/admin/sessions` | All sessions (detail in Sheet) | JWT | `admin` |
 
@@ -77,8 +77,8 @@ Per [FE-GUIDELINES](../FE-GUIDELINES.md), map routes to `src/features/`:
 | `/login` | `src/features/auth-login/` |
 | `/worker` | `src/features/worker-home/` |
 | `/worker/sessions`, `/worker/sessions/new`, `/worker/sessions/:id` | `src/features/worker-sessions/` |
-| `/supervisor`, `/supervisor/workers`, `/supervisor/sessions`, `/supervisor/analytics` | `src/features/dashboard/pages/supervisor/` (+ `SessionDetailSheet` in `components/`) |
-| `/admin`, `/admin/workers`, `/admin/sessions` | `src/features/dashboard/pages/admin/` (+ `SessionDetailSheet` in `components/`) |
+| `/supervisor`, `/supervisor/workers`, `/supervisor/sessions` | `src/features/dashboard/pages/` (`AnalyticsDashboardPage`, supervisor pages) (+ `SessionDetailSheet` in `components/`) |
+| `/admin`, `/admin/workers`, `/admin/sessions` | `src/features/dashboard/pages/` (`AnalyticsDashboardPage`, admin pages) (+ `SessionDetailSheet` in `components/`) |
 
 Shared dashboard shell (sidebar, header, nav): `src/features/dashboard/layout/`
 

@@ -16,7 +16,7 @@ import {
 } from "./sessions.repository.js";
 import type { CreateSessionBody, UpdateSessionBody } from "./sessions.schema.js";
 
-export interface SupervisorAnalyticsWorkerRow {
+export interface AnalyticsWorkerRow {
   workerId: string;
   district: string;
   totalSessions: number;
@@ -27,7 +27,7 @@ export interface SupervisorAnalyticsWorkerRow {
   lastSessionLog: string | null;
 }
 
-export interface SupervisorAnalyticsResponse {
+export interface AnalyticsResponse {
   topBox: {
     totalSessions: number;
     totalReached: number;
@@ -48,8 +48,14 @@ export interface SupervisorAnalyticsResponse {
   sessionsByMonth: Array<{ month: string; sessions: number }>;
   referralsByMonth: Array<{ month: string; referrals: number }>;
   recentSubmissions: Session[];
-  workerTable: SupervisorAnalyticsWorkerRow[];
+  workerTable: AnalyticsWorkerRow[];
 }
+
+/** @deprecated Use AnalyticsWorkerRow */
+export type SupervisorAnalyticsWorkerRow = AnalyticsWorkerRow;
+
+/** @deprecated Use AnalyticsResponse */
+export type SupervisorAnalyticsResponse = AnalyticsResponse;
 
 /** @deprecated Use SupervisorAnalyticsResponse */
 export interface SupervisorAnalytics {
@@ -228,8 +234,23 @@ export class SessionsService {
   async getAnalytics(
     supervisorId: string,
     filters: AnalyticsFilters = {},
-  ): Promise<SupervisorAnalyticsResponse> {
+  ): Promise<AnalyticsResponse> {
     const workerIds = await this.getSupervisorOrgWorkerIds(supervisorId);
+    return this.buildAnalyticsResponse(workerIds, filters);
+  }
+
+  async getAdminAnalytics(
+    filters: AnalyticsFilters = {},
+  ): Promise<AnalyticsResponse> {
+    const { workers: workerIds } =
+      await this.workersService.listAllWorkerIds();
+    return this.buildAnalyticsResponse(workerIds, filters);
+  }
+
+  private async buildAnalyticsResponse(
+    workerIds: string[],
+    filters: AnalyticsFilters,
+  ): Promise<AnalyticsResponse> {
     const totalWorkers = workerIds.length;
 
     const chartFilters: AnalyticsFilters = {
@@ -273,7 +294,7 @@ export class SessionsService {
       workerStats.map((row) => [row.workerId, row]),
     );
 
-    const workerTable: SupervisorAnalyticsWorkerRow[] = await Promise.all(
+    const workerTable: AnalyticsWorkerRow[] = await Promise.all(
       workerIds.map(async (workerId) => {
         const worker = await this.workersService.findById(workerId);
         const stats = statsByWorkerId.get(workerId);

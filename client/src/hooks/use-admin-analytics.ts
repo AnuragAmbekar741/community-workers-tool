@@ -1,20 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { getAnalytics } from "@/api/supervisor-api";
+import { getAnalytics } from "@/api/admin-api";
 import type { AnalyticsFilters } from "@/types/analytics";
 
-export const supervisorAnalyticsKeys = {
-  all: ["supervisor", "analytics"] as const,
+export const adminAnalyticsKeys = {
+  all: ["admin", "analytics"] as const,
   list: (filters: AnalyticsFilters) =>
-    [...supervisorAnalyticsKeys.all, filters] as const,
+    [...adminAnalyticsKeys.all, filters] as const,
 };
 
-export function useSupervisorAnalytics(
+export function useAdminAnalytics(
   filters: AnalyticsFilters,
   options?: { enabled?: boolean },
 ) {
   return useQuery({
-    queryKey: supervisorAnalyticsKeys.list(filters),
+    queryKey: adminAnalyticsKeys.list(filters),
     queryFn: () => getAnalytics(filters),
     enabled: options?.enabled ?? true,
   });

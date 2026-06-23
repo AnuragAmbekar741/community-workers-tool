@@ -11,9 +11,13 @@ export const adminKeys = {
   session: (id: string) => [...adminKeys.all, "sessions", id] as const,
 };
 
-export function useAdminWorkers(status?: WorkerStatusFilter) {
+export function useAdminWorkers(
+  status?: WorkerStatusFilter,
+  options?: { enabled?: boolean },
+) {
   return useQuery({
     queryKey: adminKeys.workers(status),
     queryFn: () => listWorkers(status),
+    enabled: options?.enabled ?? true,
   });
 }

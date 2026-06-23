@@ -1,12 +1,10 @@
-import { createBrowserRouter, Outlet } from "react-router-dom";
+import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DashboardLayout } from "@/features/dashboard/layout/DashboardLayout";
-import { AdminOverviewPage } from "@/features/dashboard/pages/admin/AdminOverviewPage";
 import { AdminSessionsPage } from "@/features/dashboard/pages/admin/AdminSessionsPage";
 import { AdminWorkersPage } from "@/features/dashboard/pages/admin/AdminWorkersPage";
-import { SupervisorAnalyticsPage } from "@/features/dashboard/pages/supervisor/SupervisorAnalyticsPage";
-import { SupervisorOverviewPage } from "@/features/dashboard/pages/supervisor/SupervisorOverviewPage";
+import { AnalyticsDashboardPage } from "@/features/dashboard/pages/AnalyticsDashboardPage";
 import { SupervisorSessionsPage } from "@/features/dashboard/pages/supervisor/SupervisorSessionsPage";
 import { SupervisorWorkersPage } from "@/features/dashboard/pages/supervisor/SupervisorWorkersPage";
 import { AuthLoginStubPage } from "@/features/auth-login/AuthLoginStubPage";
@@ -59,10 +57,16 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
         children: [
-          { index: true, element: <SupervisorOverviewPage /> },
+          {
+            index: true,
+            element: <AnalyticsDashboardPage role="supervisor" />,
+          },
           { path: "workers", element: <SupervisorWorkersPage /> },
           { path: "sessions", element: <SupervisorSessionsPage /> },
-          { path: "analytics", element: <SupervisorAnalyticsPage /> },
+          {
+            path: "analytics",
+            element: <Navigate to="/supervisor" replace />,
+          },
         ],
       },
       {
@@ -73,7 +77,7 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
         children: [
-          { index: true, element: <AdminOverviewPage /> },
+          { index: true, element: <AnalyticsDashboardPage role="admin" /> },
           { path: "workers", element: <AdminWorkersPage /> },
           { path: "sessions", element: <AdminSessionsPage /> },
         ],

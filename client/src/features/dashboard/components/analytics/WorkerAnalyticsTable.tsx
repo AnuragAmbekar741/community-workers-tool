@@ -21,13 +21,14 @@ import {
 import { DISTRICT_OPTIONS } from "@/lib/constants";
 import { getOptionLabel } from "@/lib/option-label";
 import { formatSessionDate } from "@/lib/session-format";
-import type { SupervisorAnalyticsWorkerRow } from "@/types/analytics";
+import type { AnalyticsWorkerRow } from "@/types/analytics";
 import type { District } from "@/lib/constants";
 
 import { getTopicChartLabel, formatMonthLabel } from "./analytics-utils";
 
 type WorkerAnalyticsTableProps = {
-  workers: SupervisorAnalyticsWorkerRow[];
+  workers: AnalyticsWorkerRow[];
+  sessionsPath: string;
   workerMonth: string;
   onWorkerMonthChange: (value: string) => void;
   monthOptions: string[];
@@ -42,6 +43,7 @@ function formatTopicsLabel(topics: string[]): string {
 
 export function WorkerAnalyticsTable({
   workers,
+  sessionsPath,
   workerMonth,
   onWorkerMonthChange,
   monthOptions,
@@ -94,7 +96,7 @@ export function WorkerAnalyticsTable({
                     >
                       <td className="py-2 pr-4">
                         <Link
-                          to={`/supervisor/sessions?workerId=${worker.workerId}`}
+                          to={`${sessionsPath}?workerId=${worker.workerId}`}
                           className="font-medium text-primary hover:underline"
                         >
                           {worker.workerId}

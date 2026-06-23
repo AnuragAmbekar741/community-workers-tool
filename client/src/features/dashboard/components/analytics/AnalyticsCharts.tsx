@@ -20,7 +20,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/base/card";
-import type { SupervisorAnalyticsResponse } from "@/types/analytics";
+import type { AnalyticsResponse } from "@/types/analytics";
 
 import {
   CHART_COLORS,
@@ -31,13 +31,13 @@ import {
 import { ChartEmptyState } from "./ChartEmptyState";
 
 type AnalyticsChartsProps = {
-  data: SupervisorAnalyticsResponse;
+  data: AnalyticsResponse;
 };
 
 function ReachByMonthChart({
   data,
 }: {
-  data: SupervisorAnalyticsResponse["reachByMonth"];
+  data: AnalyticsResponse["reachByMonth"];
 }) {
   const chartData = useMemo(
     () =>
@@ -68,7 +68,7 @@ function ReachByMonthChart({
 function SessionsByTopicChart({
   data,
 }: {
-  data: SupervisorAnalyticsResponse["sessionsByTopic"];
+  data: AnalyticsResponse["sessionsByTopic"];
 }) {
   const chartData = useMemo(
     () =>
@@ -107,7 +107,7 @@ function SessionsByTopicChart({
 function ReachDistributionChart({
   data,
 }: {
-  data: SupervisorAnalyticsResponse["reachDistribution"];
+  data: AnalyticsResponse["reachDistribution"];
 }) {
   const chartData = useMemo(() => {
     const total = Object.values(data).reduce((sum, value) => sum + value, 0);
@@ -157,7 +157,7 @@ function ReachDistributionChart({
 function SessionsByMonthChart({
   data,
 }: {
-  data: SupervisorAnalyticsResponse["sessionsByMonth"];
+  data: AnalyticsResponse["sessionsByMonth"];
 }) {
   const chartData = useMemo(
     () =>
@@ -194,7 +194,7 @@ function SessionsByMonthChart({
 function ReferralsByMonthChart({
   data,
 }: {
-  data: SupervisorAnalyticsResponse["referralsByMonth"];
+  data: AnalyticsResponse["referralsByMonth"];
 }) {
   const chartData = useMemo(
     () =>

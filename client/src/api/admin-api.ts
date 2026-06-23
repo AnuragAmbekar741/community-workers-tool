@@ -3,6 +3,7 @@ import type {
   ListWorkersResponse,
   WorkerStatusFilter,
 } from "@/types/admin";
+import type { AnalyticsFilters, AnalyticsResponse } from "@/types/analytics";
 import type {
   CreateSessionRequest,
   GetSessionResponse,
@@ -58,4 +59,13 @@ export async function updateSession(
 
 export async function deleteSession(sessionId: string): Promise<void> {
   await api.delete(`/admin/sessions/${sessionId}`);
+}
+
+export async function getAnalytics(
+  filters: AnalyticsFilters = {},
+): Promise<AnalyticsResponse> {
+  const { data } = await api.get<AnalyticsResponse>("/admin/analytics", {
+    params: filters,
+  });
+  return data;
 }
