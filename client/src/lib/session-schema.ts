@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import type { CreateSessionRequest } from "@/types/session";
+import type { CreateSessionRequest, SessionDto } from "@/types/session";
 
 import { DISTRICT, TOPIC, type District } from "./constants";
 
@@ -211,6 +211,26 @@ export function toCreateSessionRequest(
     referralReason: values.referralsMade
       ? values.referralReason?.trim()
       : undefined,
+  };
+}
+
+export function toSessionFormValues(session: SessionDto): SessionFormInput {
+  return {
+    sessionDate: session.sessionDate,
+    district: session.district,
+    topic: session.topic,
+    topicOther: session.topicOther ?? "",
+    durationMin: String(session.durationMin),
+    nWomen: String(session.nWomen),
+    nMen: String(session.nMen),
+    nGirls: String(session.nGirls),
+    nBoys: String(session.nBoys),
+    nElders: String(session.nElders),
+    nOthers: String(session.nOthers),
+    keyIssues: session.keyIssues ?? "",
+    referralsMade: session.referralsMade ? "yes" : "no",
+    nReferrals: session.referralsMade ? String(session.nReferrals) : "",
+    referralReason: session.referralReason ?? "",
   };
 }
 

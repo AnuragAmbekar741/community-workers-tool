@@ -3,7 +3,11 @@ import type {
   ListWorkersResponse,
   WorkerStatusFilter,
 } from "@/types/admin";
-import type { GetSessionResponse, ListSessionsResponse } from "@/types/session";
+import type {
+  CreateSessionRequest,
+  GetSessionResponse,
+  ListSessionsResponse,
+} from "@/types/session";
 
 import { api } from "./client";
 
@@ -39,4 +43,19 @@ export async function getSession(
     `/supervisor/sessions/${sessionId}`,
   );
   return data;
+}
+
+export async function updateSession(
+  sessionId: string,
+  body: CreateSessionRequest,
+): Promise<GetSessionResponse> {
+  const { data } = await api.patch<GetSessionResponse>(
+    `/supervisor/sessions/${sessionId}`,
+    body,
+  );
+  return data;
+}
+
+export async function deleteSession(sessionId: string): Promise<void> {
+  await api.delete(`/supervisor/sessions/${sessionId}`);
 }

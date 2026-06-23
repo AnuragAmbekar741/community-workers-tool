@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm, useWatch, type Control, type Resolver } from "react-hook-form";
 
 import { Button } from "@/components/base/button";
@@ -32,9 +32,18 @@ import {
   type SessionFormInput,
   type SessionFormValues,
 } from "@/lib/session-schema";
+import type { CreateSessionRequest } from "@/types/session";
 
 type SessionFormProps = {
+  mode?: "create" | "edit";
   defaultDistrict?: District;
+  initialValues?: SessionFormInput;
+  onSubmitSuccess?: () => void;
+  onCancel?: () => void;
+  submitLabel?: string;
+  onSubmitRequest?: (body: CreateSessionRequest) => Promise<unknown>;
+  isSubmitting?: boolean;
+  onDirtyChange?: (isDirty: boolean) => void;
 };
 
 function NumberField({
@@ -79,10 +88,21 @@ function NumberField({
   );
 }
 
-export function SessionForm({ defaultDistrict }: SessionFormProps) {
+export function SessionForm({
+  mode = "create",
+  defaultDistrict,
+  initialValues,
+  onSubmitSuccess,
+  onCancel,
+  submitLabel,
+  onSubmitRequest,
+  isSubmitting,
+  onDirtyChange,
+}: SessionFormProps) {
   const navigate = useNavigate();
   const createSessionMutation = useCreateSession();
   const [rootError, setRootError] = useState<string | null>(null);
+  const isEditMode = mode === "edit";
 
   const schema = useMemo(() => createSessionFormSchema(), []);
 
@@ -92,10 +112,20 @@ export function SessionForm({ defaultDistrict }: SessionFormProps) {
       unknown,
       SessionFormValues
     >,
-    defaultValues: sessionFormDefaultValues(defaultDistrict),
+    defaultValues: initialValues ?? sessionFormDefaultValues(defaultDistrict),
   });
 
   const control = form.control as unknown as Control<SessionFormInput>;
+
+  useEffect(() => {
+    if (initialValues) {
+      form.reset(initialValues);
+    }
+  }, [form, initialValues]);
+
+  useEffect(() => {
+    onDirtyChange?.(form.formState.isDirty);
+  }, [form.formState.isDirty, onDirtyChange]);
 
   const watchedValues = useWatch({ control: form.control });
   const topic = watchedValues.topic;
@@ -109,11 +139,21 @@ export function SessionForm({ defaultDistrict }: SessionFormProps) {
     nOthers: Number(watchedValues.nOthers) || 0,
   });
 
+  const pending =
+    isSubmitting ?? (isEditMode ? false : createSessionMutation.isPending);
+
   async function onSubmit(values: SessionFormValues) {
     setRootError(null);
+    const body = toCreateSessionRequest(values);
+
     try {
-      await createSessionMutation.mutateAsync(toCreateSessionRequest(values));
-      navigate("/worker", { replace: true });
+      if (isEditMode && onSubmitRequest) {
+        await onSubmitRequest(body);
+      } else {
+        await createSessionMutation.mutateAsync(body);
+        navigate("/worker", { replace: true });
+      }
+      onSubmitSuccess?.();
     } catch (error) {
       if (isApiError(error)) {
         setRootError(error.message);
@@ -122,6 +162,9 @@ export function SessionForm({ defaultDistrict }: SessionFormProps) {
       }
     }
   }
+
+  const defaultSubmitLabel = isEditMode ? "Save changes" : "Save session";
+  const resolvedSubmitLabel = submitLabel ?? defaultSubmitLabel;
 
   return (
     <Form {...form}>
@@ -333,17 +376,27 @@ export function SessionForm({ defaultDistrict }: SessionFormProps) {
           </p>
         ) : null}
 
-        <Button
-          type="submit"
-          className="h-11 w-full"
-          disabled={createSessionMutation.isPending}
-        >
-          {createSessionMutation.isPending ? "Saving…" : "Save session"}
+        <Button type="submit" className="h-11 w-full" disabled={pending}>
+          {pending ? "Saving…" : resolvedSubmitLabel}
         </Button>
 
-        <Button asChild variant="outline" className="h-11 w-full">
-          <Link to="/worker">Cancel</Link>
-        </Button>
+        {isEditMode && onCancel ? (
+          <Button
+            type="button"
+            variant="outline"
+            className="h-11 w-full"
+            onClick={onCancel}
+            disabled={pending}
+          >
+            Cancel
+          </Button>
+        ) : null}
+
+        {!isEditMode ? (
+          <Button asChild variant="outline" className="h-11 w-full">
+            <Link to="/worker">Cancel</Link>
+          </Button>
+        ) : null}
       </form>
     </Form>
   );
