@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import type { RowSelectionState } from "@tanstack/react-table";
 
 import { DataTablePage } from "@/components/data-table/data-table-page";
+import { SessionDetailSheet } from "@/features/dashboard/components/SessionDetailSheet";
 import { SessionsDataTable } from "@/features/dashboard/components/SessionsDataTable";
 import { useAdminSessions } from "@/hooks/use-admin-sessions";
 import { DISTRICT_OPTIONS } from "@/lib/constants";
@@ -14,6 +15,10 @@ export function AdminSessionsPage() {
     useState<SessionDistrictFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(
+    null,
+  );
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const { data, isLoading, isError, error } = useAdminSessions();
   const sessions = data?.sessions ?? [];
@@ -31,6 +36,18 @@ export function AdminSessionsPage() {
     setDistrictFilter(value);
     setRowSelection({});
     setSearchQuery("");
+  }
+
+  function handleSessionOpen(sessionId: string) {
+    setSelectedSessionId(sessionId);
+    setSheetOpen(true);
+  }
+
+  function handleSheetOpenChange(open: boolean) {
+    setSheetOpen(open);
+    if (!open) {
+      setSelectedSessionId(null);
+    }
   }
 
   if (isLoading) {
@@ -69,7 +86,13 @@ export function AdminSessionsPage() {
         onSearchQueryChange={setSearchQuery}
         rowSelection={rowSelection}
         onRowSelectionChange={setRowSelection}
-        sessionDetailPath={(id) => `/admin/sessions/${id}`}
+        onSessionClick={handleSessionOpen}
+      />
+      <SessionDetailSheet
+        role="admin"
+        sessionId={selectedSessionId}
+        open={sheetOpen}
+        onOpenChange={handleSheetOpenChange}
       />
     </DataTablePage>
   );

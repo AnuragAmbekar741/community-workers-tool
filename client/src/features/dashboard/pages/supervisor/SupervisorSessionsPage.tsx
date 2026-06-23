@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import type { RowSelectionState } from "@tanstack/react-table";
 
 import { DataTablePage } from "@/components/data-table/data-table-page";
+import { SessionDetailSheet } from "@/features/dashboard/components/SessionDetailSheet";
 import { SessionsDataTable } from "@/features/dashboard/components/SessionsDataTable";
 import { useSupervisorSessions } from "@/hooks/use-supervisor-sessions";
 import { DISTRICT_OPTIONS } from "@/lib/constants";
@@ -14,6 +15,10 @@ export function SupervisorSessionsPage() {
     useState<SessionDistrictFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(
+    null,
+  );
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const { data, isLoading, isError, error } = useSupervisorSessions();
   const sessions = data?.sessions ?? [];
@@ -31,6 +36,18 @@ export function SupervisorSessionsPage() {
     setDistrictFilter(value);
     setRowSelection({});
     setSearchQuery("");
+  }
+
+  function handleSessionOpen(sessionId: string) {
+    setSelectedSessionId(sessionId);
+    setSheetOpen(true);
+  }
+
+  function handleSheetOpenChange(open: boolean) {
+    setSheetOpen(open);
+    if (!open) {
+      setSelectedSessionId(null);
+    }
   }
 
   if (isLoading) {
@@ -69,7 +86,13 @@ export function SupervisorSessionsPage() {
         onSearchQueryChange={setSearchQuery}
         rowSelection={rowSelection}
         onRowSelectionChange={setRowSelection}
-        sessionDetailPath={(id) => `/supervisor/sessions/${id}`}
+        onSessionClick={handleSessionOpen}
+      />
+      <SessionDetailSheet
+        role="supervisor"
+        sessionId={selectedSessionId}
+        open={sheetOpen}
+        onOpenChange={handleSheetOpenChange}
       />
     </DataTablePage>
   );
