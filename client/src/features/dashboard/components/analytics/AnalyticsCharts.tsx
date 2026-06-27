@@ -21,14 +21,21 @@ import {
 import type { AnalyticsResponse } from "@/types/analytics";
 
 import {
-  CHART_COLORS,
-  formatMonthLabel,
+  buildMonthlyChartRows,
   getTopicChartLabel,
+  PIE_CHART_COLORS,
   REACH_DISTRIBUTION_LABELS,
+  TOPIC_CHART_COLORS,
 } from "./analytics-utils";
 import { ChartEmptyState } from "./ChartEmptyState";
+import { MonthChartLegend } from "./MonthChartLegend";
 
 const VERTICAL_BAR_CHART_MARGIN = { top: 8, right: 16, left: 0, bottom: 0 };
+
+const CHART_GRID_PROPS = {
+  strokeDasharray: "3 3",
+  stroke: "var(--border)",
+};
 
 const COUNT_Y_AXIS_PROPS = {
   allowDecimals: false,
@@ -45,14 +52,7 @@ function ReachByMonthChart({
 }: {
   data: AnalyticsResponse["reachByMonth"];
 }) {
-  const chartData = useMemo(
-    () =>
-      data.map((row) => ({
-        ...row,
-        label: formatMonthLabel(row.month),
-      })),
-    [data],
-  );
+  const chartData = useMemo(() => buildMonthlyChartRows(data), [data]);
 
   if (chartData.length === 0) {
     return <ChartEmptyState />;
@@ -61,11 +61,15 @@ function ReachByMonthChart({
   return (
     <ResponsiveContainer width="100%" height={240}>
       <BarChart data={chartData} margin={VERTICAL_BAR_CHART_MARGIN}>
-        <CartesianGrid strokeDasharray="3 3" />
+        <CartesianGrid {...CHART_GRID_PROPS} />
         <XAxis dataKey="label" tick={{ fontSize: 12 }} />
         <YAxis {...COUNT_Y_AXIS_PROPS} />
         <Tooltip />
-        <Bar dataKey="totalReached" fill="hsl(var(--primary))" name="Reached" />
+        <Bar dataKey="totalReached" name="Reached">
+          {chartData.map((row) => (
+            <Cell key={row.month} fill={row.fill} />
+          ))}
+        </Bar>
       </BarChart>
     </ResponsiveContainer>
   );
@@ -99,7 +103,7 @@ function SessionsByTopicChart({
         layout="vertical"
         margin={{ top: 8, left: 8, right: 16, bottom: 0 }}
       >
-        <CartesianGrid strokeDasharray="3 3" />
+        <CartesianGrid {...CHART_GRID_PROPS} />
         <XAxis
           type="number"
           allowDecimals={false}
@@ -113,7 +117,14 @@ function SessionsByTopicChart({
           tick={{ fontSize: 11 }}
         />
         <Tooltip />
-        <Bar dataKey="count" fill="hsl(var(--primary))" name="Sessions" />
+        <Bar dataKey="count" name="Sessions">
+          {chartData.map((row, index) => (
+            <Cell
+              key={row.topic}
+              fill={TOPIC_CHART_COLORS[index % TOPIC_CHART_COLORS.length]}
+            />
+          ))}
+        </Bar>
       </BarChart>
     </ResponsiveContainer>
   );
@@ -159,7 +170,9 @@ function ReachDistributionChart({
           {chartData.map((entry, index) => (
             <Cell
               key={entry.name}
-              fill={CHART_COLORS[index % CHART_COLORS.length]}
+              fill={PIE_CHART_COLORS[index]}
+              stroke="#ffffff"
+              strokeWidth={2}
             />
           ))}
         </Pie>
@@ -174,14 +187,7 @@ function SessionsByMonthChart({
 }: {
   data: AnalyticsResponse["sessionsByMonth"];
 }) {
-  const chartData = useMemo(
-    () =>
-      data.map((row) => ({
-        ...row,
-        label: formatMonthLabel(row.month),
-      })),
-    [data],
-  );
+  const chartData = useMemo(() => buildMonthlyChartRows(data), [data]);
 
   if (chartData.length === 0) {
     return <ChartEmptyState />;
@@ -190,11 +196,15 @@ function SessionsByMonthChart({
   return (
     <ResponsiveContainer width="100%" height={240}>
       <BarChart data={chartData} margin={VERTICAL_BAR_CHART_MARGIN}>
-        <CartesianGrid strokeDasharray="3 3" />
+        <CartesianGrid {...CHART_GRID_PROPS} />
         <XAxis dataKey="label" tick={{ fontSize: 12 }} />
         <YAxis {...COUNT_Y_AXIS_PROPS} />
         <Tooltip />
-        <Bar dataKey="sessions" fill="hsl(var(--primary))" name="Sessions" />
+        <Bar dataKey="sessions" name="Sessions">
+          {chartData.map((row) => (
+            <Cell key={row.month} fill={row.fill} />
+          ))}
+        </Bar>
       </BarChart>
     </ResponsiveContainer>
   );
@@ -205,14 +215,7 @@ function ReferralsByMonthChart({
 }: {
   data: AnalyticsResponse["referralsByMonth"];
 }) {
-  const chartData = useMemo(
-    () =>
-      data.map((row) => ({
-        ...row,
-        label: formatMonthLabel(row.month),
-      })),
-    [data],
-  );
+  const chartData = useMemo(() => buildMonthlyChartRows(data), [data]);
 
   if (chartData.length === 0) {
     return <ChartEmptyState />;
@@ -221,73 +224,90 @@ function ReferralsByMonthChart({
   return (
     <ResponsiveContainer width="100%" height={240}>
       <BarChart data={chartData} margin={VERTICAL_BAR_CHART_MARGIN}>
-        <CartesianGrid strokeDasharray="3 3" />
+        <CartesianGrid {...CHART_GRID_PROPS} />
         <XAxis dataKey="label" tick={{ fontSize: 12 }} />
         <YAxis {...COUNT_Y_AXIS_PROPS} />
         <Tooltip />
-        <Bar dataKey="referrals" fill="hsl(var(--primary))" name="Referrals" />
+        <Bar dataKey="referrals" name="Referrals">
+          {chartData.map((row) => (
+            <Cell key={row.month} fill={row.fill} />
+          ))}
+        </Bar>
       </BarChart>
     </ResponsiveContainer>
   );
 }
 
 function AnalyticsChartsComponent({ data }: AnalyticsChartsProps) {
+  const legendMonths = useMemo(
+    () => [
+      ...data.reachByMonth.map((row) => row.month),
+      ...data.sessionsByMonth.map((row) => row.month),
+      ...data.referralsByMonth.map((row) => row.month),
+    ],
+    [data.reachByMonth, data.sessionsByMonth, data.referralsByMonth],
+  );
+
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base font-semibold">
-            Total reach by month
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ReachByMonthChart data={data.reachByMonth} />
-        </CardContent>
-      </Card>
+    <div className="space-y-4">
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base font-semibold">
+              Total reach by month
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ReachByMonthChart data={data.reachByMonth} />
+          </CardContent>
+        </Card>
 
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base font-semibold">
-            Sessions by topic
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <SessionsByTopicChart data={data.sessionsByTopic} />
-        </CardContent>
-      </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base font-semibold">
+              Sessions by topic
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <SessionsByTopicChart data={data.sessionsByTopic} />
+          </CardContent>
+        </Card>
 
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base font-semibold">
-            Reach distribution
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ReachDistributionChart data={data.reachDistribution} />
-        </CardContent>
-      </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base font-semibold">
+              Reach distribution
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ReachDistributionChart data={data.reachDistribution} />
+          </CardContent>
+        </Card>
 
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base font-semibold">
-            Sessions per month
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <SessionsByMonthChart data={data.sessionsByMonth} />
-        </CardContent>
-      </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base font-semibold">
+              Sessions per month
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <SessionsByMonthChart data={data.sessionsByMonth} />
+          </CardContent>
+        </Card>
 
-      <Card className="lg:col-span-2">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base font-semibold">
-            Referrals per month
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ReferralsByMonthChart data={data.referralsByMonth} />
-        </CardContent>
-      </Card>
+        <Card className="lg:col-span-2">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base font-semibold">
+              Referrals per month
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ReferralsByMonthChart data={data.referralsByMonth} />
+          </CardContent>
+        </Card>
+      </div>
+
+      <MonthChartLegend months={legendMonths} />
     </div>
   );
 }

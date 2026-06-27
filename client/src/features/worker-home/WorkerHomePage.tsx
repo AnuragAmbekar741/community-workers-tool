@@ -7,6 +7,7 @@ import { useSessions } from "@/hooks/use-sessions";
 import { isApiError } from "@/lib/api-error";
 
 import { WorkerPageShell } from "@/features/worker/layout/WorkerPageShell";
+import { WorkerSystemIdCallout } from "@/features/auth/components/WorkerSystemIdCallout";
 import { SessionCard } from "@/features/worker-sessions/components/SessionCard";
 
 const RECENT_SESSIONS_LIMIT = 5;
@@ -37,6 +38,10 @@ export function WorkerHomePage() {
     <WorkerPageShell title="Welcome">
       {me?.name ? (
         <p className="text-base text-muted-foreground">Hello, {me.name}</p>
+      ) : null}
+
+      {isWorkerMe(me) ? (
+        <WorkerSystemIdCallout systemId={me.systemId} />
       ) : null}
 
       {worker?.status === "pending" ? (

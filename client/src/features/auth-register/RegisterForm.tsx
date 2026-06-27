@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/base/select";
 import { useRegister } from "@/hooks/use-register";
+import { WorkerSystemIdCallout } from "@/features/auth/components/WorkerSystemIdCallout";
 import {
   DISTRICT_OPTIONS,
   EDUCATION_OPTIONS,
@@ -43,6 +44,9 @@ export function RegisterForm() {
   const navigate = useNavigate();
   const registerMutation = useRegister();
   const [rootError, setRootError] = useState<string | null>(null);
+  const [registeredSystemId, setRegisteredSystemId] = useState<string | null>(
+    null,
+  );
 
   const form = useForm<RegisterFormInput, unknown, RegisterFormValues>({
     resolver: zodResolver(registerFormSchema) as Resolver<
@@ -56,8 +60,8 @@ export function RegisterForm() {
   async function onSubmit(values: RegisterFormValues) {
     setRootError(null);
     try {
-      await registerMutation.mutateAsync(toRegisterRequest(values));
-      navigate("/login?registered=pending", { replace: true });
+      const result = await registerMutation.mutateAsync(toRegisterRequest(values));
+      setRegisteredSystemId(result.user.systemId);
     } catch (error) {
       if (isApiError(error)) {
         setRootError(error.message);
@@ -65,6 +69,39 @@ export function RegisterForm() {
         setRootError("Registration failed. Please try again.");
       }
     }
+  }
+
+  if (registeredSystemId) {
+    return (
+      <div className="space-y-4">
+        <div className="space-y-1">
+          <h2 className="text-xl font-semibold">Registration submitted</h2>
+          <p className="text-base text-muted-foreground">
+            Your account is awaiting admin approval. You cannot log sessions
+            until you are approved.
+          </p>
+        </div>
+
+        <WorkerSystemIdCallout systemId={registeredSystemId} variant="success" />
+
+        <Button
+          type="button"
+          className="h-11 w-full"
+          onClick={() =>
+            navigate("/login", {
+              replace: true,
+              state: { registeredSystemId },
+            })
+          }
+        >
+          Continue to sign in
+        </Button>
+
+        <Button asChild variant="outline" className="h-11 w-full">
+          <Link to="/">Back to home</Link>
+        </Button>
+      </div>
+    );
   }
 
   return (
