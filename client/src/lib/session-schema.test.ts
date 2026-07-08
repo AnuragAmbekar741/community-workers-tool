@@ -5,7 +5,7 @@ import { sessionFormSchema } from "./session-schema";
 const baseForm = {
   sessionDate: "2026-01-15",
   district: "gaborone",
-  topic: "srh",
+  topic: "relationships",
   topicOther: "",
   durationMin: "60",
   nWomen: "5",

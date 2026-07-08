@@ -3,7 +3,6 @@ import type {
   Education,
   Gender,
   Organisation,
-  Village,
   WorkerRole,
 } from "@/lib/constants";
 import type { UserDto } from "./user";
@@ -15,7 +14,7 @@ export type WorkerDto = {
   workerRole: WorkerRole;
   education: Education;
   district: District;
-  villages: Village[];
+  villages: string[];
   consentGiven: boolean;
 };
 
@@ -44,7 +43,7 @@ export type RegisterRequest = {
   workerRole: WorkerRole;
   education: Education;
   district: District;
-  villages: Village[];
+  villages: string[];
   consentGiven: true;
 };
 

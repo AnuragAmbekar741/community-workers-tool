@@ -28,7 +28,6 @@ import {
   EDUCATION_OPTIONS,
   GENDER_OPTIONS,
   ORGANISATION_OPTIONS,
-  VILLAGE_OPTIONS,
   WORKER_ROLE_OPTIONS,
 } from "@/lib/constants";
 import { isApiError } from "@/lib/api-error";
@@ -324,32 +323,10 @@ export function RegisterForm() {
           name="villages"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Villages</FormLabel>
-              <div className="space-y-2 rounded-md border border-border p-3">
-                {VILLAGE_OPTIONS.map((option) => {
-                  const checked = field.value.includes(option.value);
-                  return (
-                    <label
-                      key={option.value}
-                      className="flex min-h-11 cursor-pointer items-center gap-3"
-                    >
-                      <Checkbox
-                        checked={checked}
-                        onCheckedChange={(isChecked) => {
-                          if (isChecked === true) {
-                            field.onChange([...field.value, option.value]);
-                            return;
-                          }
-                          field.onChange(
-                            field.value.filter((v) => v !== option.value),
-                          );
-                        }}
-                      />
-                      <span className="text-base">{option.label}</span>
-                    </label>
-                  );
-                })}
-              </div>
+              <FormLabel>Village</FormLabel>
+              <FormControl>
+                <Input autoComplete="address-level3" {...field} />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}

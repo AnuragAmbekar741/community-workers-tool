@@ -9,7 +9,14 @@ export type Role = (typeof ROLE)[number];
 export const GENDER = ["female", "male", "prefer_not_to_say"] as const;
 export type Gender = (typeof GENDER)[number];
 
-export const WORKER_ROLE = ["CDO", "SW", "CHW", "other"] as const;
+export const WORKER_ROLE = [
+  "CDO",
+  "SW",
+  "CHW",
+  "counsellor",
+  "program_officer",
+  "other",
+] as const;
 export type WorkerRole = (typeof WORKER_ROLE)[number];
 
 export const EDUCATION = [
@@ -23,15 +30,6 @@ export const EDUCATION = [
   "postgrad",
 ] as const;
 export type Education = (typeof EDUCATION)[number];
-
-export const VILLAGE = [
-  "village_a",
-  "village_b",
-  "village_c",
-  "village_d",
-  "village_e",
-] as const;
-export type Village = (typeof VILLAGE)[number];
 
 export const DISTRICT = [
   "gaborone",
@@ -66,21 +64,17 @@ export const DISTRICT = [
 export type District = (typeof DISTRICT)[number];
 
 export const TOPIC = [
-  "adolescence_youth_risk",
-  "puberty_body_changes",
-  "srh",
-  "relationships_gender_norms",
-  "consent_gbv",
-  "safeguarding_reporting",
-  "human_body_changes",
-  "puberty",
+  "adolescence_puberty",
   "menstruation",
-  "hiv_sti_prevention",
-  "reproduction_contraceptives",
+  "human_body_development",
+  "reproduction_contraception",
   "relationships",
   "power_consent",
   "gender",
-  "violence",
+  "gender_based_violence",
+  "hiv_sti_prevention_treatment",
+  "psychosocial_counselling",
+  "safeguarding_reporting",
   "other",
 ] as const;
 export type Topic = (typeof TOPIC)[number];
@@ -93,7 +87,6 @@ export const zRole = z.enum(ROLE);
 export const zGender = z.enum(GENDER);
 export const zWorkerRole = z.enum(WORKER_ROLE);
 export const zEducation = z.enum(EDUCATION);
-export const zVillage = z.enum(VILLAGE);
 export const zDistrict = z.enum(DISTRICT);
 export const zTopic = z.enum(TOPIC);
 export const zWorkerStatus = z.enum(WORKER_STATUS);
@@ -104,7 +97,6 @@ export const CONSTANTS = {
   gender: GENDER,
   worker_role: WORKER_ROLE,
   education: EDUCATION,
-  village: VILLAGE,
   district: DISTRICT,
   topic: TOPIC,
   worker_status: WORKER_STATUS,

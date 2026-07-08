@@ -11,7 +11,6 @@ import {
   EDUCATION_OPTIONS,
   GENDER_OPTIONS,
   ORGANISATION_OPTIONS,
-  VILLAGE_OPTIONS,
   WORKER_ROLE_OPTIONS,
 } from "@/lib/constants";
 import { isWorkerMe } from "@/lib/me";
@@ -66,9 +65,7 @@ export function WorkerProfilePage() {
   }
 
   const { worker } = me;
-  const villageLabels = worker.villages
-    .map((village) => getOptionLabel(VILLAGE_OPTIONS, village))
-    .join(", ");
+  const villageLabel = worker.villages.join(", ");
 
   return (
     <WorkerPageShell title="Profile" backTo="/worker">
@@ -113,7 +110,7 @@ export function WorkerProfilePage() {
           label="District"
           value={getOptionLabel(DISTRICT_OPTIONS, worker.district)}
         />
-        <ProfileField label="Villages" value={villageLabels || "—"} />
+        <ProfileField label="Village" value={villageLabel || "—"} />
       </div>
 
       <Button

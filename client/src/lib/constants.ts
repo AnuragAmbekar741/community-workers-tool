@@ -1,6 +1,13 @@
 export const GENDER = ["female", "male", "prefer_not_to_say"] as const;
 export const ORGANISATION = ["BONEPWA", "MAHALAYPEE"] as const;
-export const WORKER_ROLE = ["CDO", "SW", "CHW", "other"] as const;
+export const WORKER_ROLE = [
+  "CDO",
+  "SW",
+  "CHW",
+  "counsellor",
+  "program_officer",
+  "other",
+] as const;
 export const EDUCATION = [
   "none",
   "primary",
@@ -41,29 +48,18 @@ export const DISTRICT = [
   "kgalagadi_south",
   "kgalagadi_north",
 ] as const;
-export const VILLAGE = [
-  "village_a",
-  "village_b",
-  "village_c",
-  "village_d",
-  "village_e",
-] as const;
 export const TOPIC = [
-  "adolescence_youth_risk",
-  "puberty_body_changes",
-  "srh",
-  "relationships_gender_norms",
-  "consent_gbv",
-  "safeguarding_reporting",
-  "human_body_changes",
-  "puberty",
+  "adolescence_puberty",
   "menstruation",
-  "hiv_sti_prevention",
-  "reproduction_contraceptives",
+  "human_body_development",
+  "reproduction_contraception",
   "relationships",
   "power_consent",
   "gender",
-  "violence",
+  "gender_based_violence",
+  "hiv_sti_prevention_treatment",
+  "psychosocial_counselling",
+  "safeguarding_reporting",
   "other",
 ] as const;
 
@@ -72,7 +68,6 @@ export type Organisation = (typeof ORGANISATION)[number];
 export type WorkerRole = (typeof WORKER_ROLE)[number];
 export type Education = (typeof EDUCATION)[number];
 export type District = (typeof DISTRICT)[number];
-export type Village = (typeof VILLAGE)[number];
 export type Topic = (typeof TOPIC)[number];
 
 export const GENDER_OPTIONS = [
@@ -90,6 +85,8 @@ export const WORKER_ROLE_OPTIONS = [
   { value: "CDO", label: "CDO" },
   { value: "SW", label: "SW" },
   { value: "CHW", label: "CHW" },
+  { value: "counsellor", label: "Counsellor" },
+  { value: "program_officer", label: "Program Officer" },
   { value: "other", label: "Other" },
 ] as const satisfies ReadonlyArray<{ value: WorkerRole; label: string }>;
 
@@ -138,29 +135,23 @@ export const DISTRICT_OPTIONS = [
   { value: "kgalagadi_north", label: "Kgalagadi North" },
 ] as const satisfies ReadonlyArray<{ value: District; label: string }>;
 
-export const VILLAGE_OPTIONS = [
-  { value: "village_a", label: "Village A" },
-  { value: "village_b", label: "Village B" },
-  { value: "village_c", label: "Village C" },
-  { value: "village_d", label: "Village D" },
-  { value: "village_e", label: "Village E" },
-] as const satisfies ReadonlyArray<{ value: Village; label: string }>;
-
 export const TOPIC_OPTIONS = [
-  { value: "adolescence_youth_risk", label: "Adolescence & youth risk" },
-  { value: "puberty_body_changes", label: "Puberty & body changes" },
-  { value: "srh", label: "Sexual & reproductive health" },
-  { value: "relationships_gender_norms", label: "Relationships & gender norms" },
-  { value: "consent_gbv", label: "Consent & GBV" },
-  { value: "safeguarding_reporting", label: "Safeguarding & reporting" },
-  { value: "human_body_changes", label: "Human Body and Changes" },
-  { value: "puberty", label: "Puberty" },
+  { value: "adolescence_puberty", label: "Adolescence and Puberty" },
   { value: "menstruation", label: "Menstruation" },
-  { value: "hiv_sti_prevention", label: "HIV and STI prevention" },
-  { value: "reproduction_contraceptives", label: "Reproduction and contraceptives" },
+  { value: "human_body_development", label: "Human body and development" },
+  {
+    value: "reproduction_contraception",
+    label: "Reproduction and contraception",
+  },
   { value: "relationships", label: "Relationships" },
   { value: "power_consent", label: "Power and Consent" },
   { value: "gender", label: "Gender" },
-  { value: "violence", label: "Violence" },
+  { value: "gender_based_violence", label: "Gender Based violence" },
+  {
+    value: "hiv_sti_prevention_treatment",
+    label: "HIV/ STI prevention and treatment",
+  },
+  { value: "psychosocial_counselling", label: "Psychosocial counselling" },
+  { value: "safeguarding_reporting", label: "Safeguarding and reporting" },
   { value: "other", label: "Other" },
 ] as const satisfies ReadonlyArray<{ value: Topic; label: string }>;

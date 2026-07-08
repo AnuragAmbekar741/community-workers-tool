@@ -6,7 +6,6 @@ import { getDataTableRowSelectColumn } from "@/components/data-table/data-table-
 import {
   DISTRICT_OPTIONS,
   ORGANISATION_OPTIONS,
-  VILLAGE_OPTIONS,
   WORKER_ROLE_OPTIONS,
 } from "@/lib/constants";
 import { getOptionLabel } from "@/lib/option-label";
@@ -67,16 +66,11 @@ export function getWorkersColumns({
     },
     {
       id: "villages",
-      accessorFn: (row) =>
-        row.worker.villages
-          .map((village) => getOptionLabel(VILLAGE_OPTIONS, village))
-          .join(", "),
-      header: "Villages",
+      accessorFn: (row) => row.worker.villages.join(", "),
+      header: "Village",
       cell: ({ row }) => (
         <span className="whitespace-normal">
-          {row.original.worker.villages
-            .map((village) => getOptionLabel(VILLAGE_OPTIONS, village))
-            .join(", ")}
+          {row.original.worker.villages.join(", ")}
         </span>
       ),
       enableSorting: false,

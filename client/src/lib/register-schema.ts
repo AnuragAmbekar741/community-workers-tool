@@ -7,13 +7,11 @@ import {
   EDUCATION,
   GENDER,
   ORGANISATION,
-  VILLAGE,
   WORKER_ROLE,
   type District,
   type Education,
   type Gender,
   type Organisation,
-  type Village,
   type WorkerRole,
 } from "./constants";
 
@@ -45,7 +43,7 @@ export const registerFormSchema = z.object({
   workerRole: requiredEnum(WORKER_ROLE, "Worker role is required"),
   education: requiredEnum(EDUCATION, "Education is required"),
   district: requiredEnum(DISTRICT, "District is required"),
-  villages: z.array(z.enum(VILLAGE)).min(1, "Select at least one village"),
+  villages: z.string().min(1, "Village is required"),
   consentGiven: z
     .boolean()
     .refine((val) => val === true, { message: "You must accept to register" }),
@@ -61,7 +59,7 @@ export type RegisterFormValues = {
   workerRole: WorkerRole;
   education: Education;
   district: District;
-  villages: Village[];
+  villages: string;
   consentGiven: boolean;
 };
 export type RegisterFormInput = z.input<typeof registerFormSchema>;
@@ -77,7 +75,7 @@ export function toRegisterRequest(values: RegisterFormValues): RegisterRequest {
     workerRole: values.workerRole,
     education: values.education,
     district: values.district,
-    villages: values.villages,
+    villages: [values.villages.trim()],
     consentGiven: true,
   };
 }
@@ -92,6 +90,6 @@ export const registerFormDefaultValues: RegisterFormInput = {
   workerRole: "",
   education: "",
   district: "",
-  villages: [],
+  villages: "",
   consentGiven: false,
 };

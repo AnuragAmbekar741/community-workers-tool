@@ -4,7 +4,6 @@ import {
   zEducation,
   zGender,
   zOrganisation,
-  zVillage,
   zWorkerRole,
 } from "../../constants/index.js";
 
@@ -18,7 +17,7 @@ export const registerWorkerBodySchema = z.object({
   workerRole: zWorkerRole,
   education: zEducation,
   district: zDistrict,
-  villages: z.array(zVillage).min(1),
+  villages: z.array(z.string().min(1)).min(1),
   consentGiven: z.literal(true),
 });
 
