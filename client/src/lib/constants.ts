@@ -1,5 +1,10 @@
 export const GENDER = ["female", "male", "prefer_not_to_say"] as const;
-export const ORGANISATION = ["BONEPWA", "MAHALAYPEE"] as const;
+export const ORGANISATION = [
+  "BONEPWA",
+  "MAHALAYPEE",
+  "MOPIPI_INTERNATIONAL",
+  "CAPTIVE_EYE",
+] as const;
 export const WORKER_ROLE = [
   "CDO",
   "SW",
@@ -79,6 +84,8 @@ export const GENDER_OPTIONS = [
 export const ORGANISATION_OPTIONS = [
   { value: "BONEPWA", label: "BONEPWA" },
   { value: "MAHALAYPEE", label: "MAHALAYPEE" },
+  { value: "MOPIPI_INTERNATIONAL", label: "Mopipi International" },
+  { value: "CAPTIVE_EYE", label: "Captive eye" },
 ] as const satisfies ReadonlyArray<{ value: Organisation; label: string }>;
 
 export const WORKER_ROLE_OPTIONS = [

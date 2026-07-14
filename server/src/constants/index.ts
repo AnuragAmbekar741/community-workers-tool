@@ -1,6 +1,11 @@
 import { z } from "zod";
 
-export const ORGANISATION = ["BONEPWA", "MAHALAYPEE"] as const;
+export const ORGANISATION = [
+  "BONEPWA",
+  "MAHALAYPEE",
+  "MOPIPI_INTERNATIONAL",
+  "CAPTIVE_EYE",
+] as const;
 export type Organisation = (typeof ORGANISATION)[number];
 
 export const ROLE = ["worker", "supervisor", "admin"] as const;
