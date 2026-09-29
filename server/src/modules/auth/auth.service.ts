@@ -1,10 +1,15 @@
+import { createHash, timingSafeEqual } from "node:crypto";
 import type { Role } from "../../constants/index.js";
 import type { User } from "../../db/schema/users.js";
 import {
   ForbiddenError,
   UnauthorizedError,
 } from "../../lib/errors.js";
-import { signToken } from "../../lib/jwt.js";
+import {
+  signPasswordResetToken,
+  signToken,
+  verifyPasswordResetToken,
+} from "../../lib/jwt.js";
 import { verifyPassword } from "../../lib/password.js";
 import {
   UsersService,
@@ -15,7 +20,12 @@ import {
   type RegisterWorkerResult,
   type WorkerProfile,
 } from "../workers/workers.service.js";
-import type { LoginBody, RegisterBody } from "./auth.schema.js";
+import type {
+  ForgotPasswordBody,
+  LoginBody,
+  RegisterBody,
+  ResetPasswordBody,
+} from "./auth.schema.js";
 
 export interface LoginResult {
   token: string;
@@ -58,6 +68,42 @@ export class AuthService {
     return this.workersService.registerWorker(body);
   }
 
+  async beginPasswordReset(
+    body: ForgotPasswordBody,
+  ): Promise<{ resetToken: string }> {
+    const user = await this.usersService.findByPhone(body.phone);
+    if (!user) {
+      throw new UnauthorizedError("No account found with that phone number");
+    }
+
+    return {
+      resetToken: signPasswordResetToken({
+        userId: user.systemId,
+        purpose: "password-reset",
+        passwordVersion: this.passwordVersion(user.passwordHash),
+      }),
+    };
+  }
+
+  async resetPassword(body: ResetPasswordBody): Promise<void> {
+    const payload = verifyPasswordResetToken(body.resetToken);
+    const user = await this.usersService.findBySystemId(payload.userId);
+    if (!user) {
+      throw new UnauthorizedError("Invalid or expired reset link");
+    }
+
+    const actualVersion = Buffer.from(this.passwordVersion(user.passwordHash));
+    const tokenVersion = Buffer.from(payload.passwordVersion);
+    if (
+      actualVersion.length !== tokenVersion.length ||
+      !timingSafeEqual(actualVersion, tokenVersion)
+    ) {
+      throw new UnauthorizedError("Invalid or expired reset link");
+    }
+
+    await this.usersService.updatePassword(user.systemId, body.password);
+  }
+
   async getMe(userId: string): Promise<MeResponse> {
     const user = await this.usersService.getPublicProfile(userId);
     if (user.role !== "worker") {
@@ -92,5 +138,9 @@ export class AuthService {
     if (worker.status === "rejected") {
       throw new ForbiddenError("Account has been rejected");
     }
+  }
+
+  private passwordVersion(passwordHash: string): string {
+    return createHash("sha256").update(passwordHash).digest("base64url");
   }
 }
