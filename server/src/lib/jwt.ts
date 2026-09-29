@@ -9,9 +9,21 @@ export interface JwtPayload {
   role: Role;
 }
 
+export interface PasswordResetPayload {
+  userId: string;
+  purpose: "password-reset";
+  passwordVersion: string;
+}
+
 const jwtPayloadSchema = z.object({
   userId: z.string(),
   role: zRole,
+});
+
+const passwordResetPayloadSchema = z.object({
+  userId: z.string(),
+  purpose: z.literal("password-reset"),
+  passwordVersion: z.string(),
 });
 
 export function signToken(payload: JwtPayload): string {
@@ -39,5 +51,25 @@ export function verifyToken(token: string): JwtPayload {
       throw new UnauthorizedError("Token expired");
     }
     throw new UnauthorizedError();
+  }
+}
+
+export function signPasswordResetToken(payload: PasswordResetPayload): string {
+  return jwt.sign(payload, env.JWT_SECRET, { expiresIn: "10m" });
+}
+
+export function verifyPasswordResetToken(token: string): PasswordResetPayload {
+  try {
+    const decoded = jwt.verify(token, env.JWT_SECRET);
+    const parsed = passwordResetPayloadSchema.safeParse(decoded);
+    if (!parsed.success) {
+      throw new UnauthorizedError("Invalid or expired reset link");
+    }
+    return parsed.data;
+  } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      throw error;
+    }
+    throw new UnauthorizedError("Invalid or expired reset link");
   }
 }
