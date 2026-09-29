@@ -35,6 +35,18 @@ export class UsersRepository {
     return user;
   }
 
+  async updatePasswordHash(
+    systemId: string,
+    passwordHash: string,
+  ): Promise<User | null> {
+    const rows = await db
+      .update(users)
+      .set({ passwordHash })
+      .where(eq(users.systemId, systemId))
+      .returning();
+    return rows[0] ?? null;
+  }
+
   async listByRole(role: Role): Promise<User[]> {
     return db.select().from(users).where(eq(users.role, role));
   }

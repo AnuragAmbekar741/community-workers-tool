@@ -83,6 +83,14 @@ export class UsersService {
     return toPublicUser(user);
   }
 
+  async updatePassword(systemId: string, password: string): Promise<void> {
+    const passwordHash = await hashPassword(password);
+    const user = await this.repo.updatePasswordHash(systemId, passwordHash);
+    if (!user) {
+      throw new NotFoundError("User not found");
+    }
+  }
+
   private assertOrganisationRules(
     role: Role,
     organisation: Organisation | null,
