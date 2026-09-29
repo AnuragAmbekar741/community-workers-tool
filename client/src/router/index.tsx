@@ -8,6 +8,7 @@ import { AnalyticsDashboardPage } from "@/features/dashboard/pages/AnalyticsDash
 import { SupervisorSessionsPage } from "@/features/dashboard/pages/supervisor/SupervisorSessionsPage";
 import { SupervisorWorkersPage } from "@/features/dashboard/pages/supervisor/SupervisorWorkersPage";
 import { AuthLoginStubPage } from "@/features/auth-login/AuthLoginStubPage";
+import { ForgotPasswordPage } from "@/features/auth-password-reset/ForgotPasswordPage";
 import { RegisterPage } from "@/features/auth-register/RegisterPage";
 import { LandingPage } from "@/features/landing/LandingPage";
 import { NotFoundPage } from "@/features/not-found/NotFoundPage";
@@ -27,6 +28,7 @@ export const router = createBrowserRouter([
       { index: true, element: <LandingPage /> },
       { path: "register", element: <RegisterPage /> },
       { path: "login", element: <AuthLoginStubPage /> },
+      { path: "forgot-password", element: <ForgotPasswordPage /> },
       {
         path: "worker",
         element: (
