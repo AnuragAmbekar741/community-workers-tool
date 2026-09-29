@@ -33,6 +33,19 @@ export type LoginResponse = {
   token: string;
 };
 
+export type ForgotPasswordRequest = {
+  phone: string;
+};
+
+export type ForgotPasswordResponse = {
+  resetToken: string;
+};
+
+export type ResetPasswordRequest = {
+  resetToken: string;
+  password: string;
+};
+
 export type RegisterRequest = {
   name: string;
   age: number;

@@ -22,7 +22,12 @@ api.interceptors.response.use(
   (error) => {
     if (axios.isAxiosError(error) && error.response?.status === 401) {
       const url = error.config?.url ?? "";
-      if (!url.endsWith("/auth/login")) {
+      const isPublicAuthRequest = [
+        "/auth/login",
+        "/auth/forgot-password",
+        "/auth/reset-password",
+      ].some((path) => url.endsWith(path));
+      if (!isPublicAuthRequest) {
         onUnauthorized();
       }
     }
