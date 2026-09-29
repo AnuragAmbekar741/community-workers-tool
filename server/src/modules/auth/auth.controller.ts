@@ -1,6 +1,11 @@
 import type { Request, Response } from "express";
 import { AuthService } from "./auth.service.js";
-import type { LoginBody, RegisterBody } from "./auth.schema.js";
+import type {
+  ForgotPasswordBody,
+  LoginBody,
+  RegisterBody,
+  ResetPasswordBody,
+} from "./auth.schema.js";
 
 const authService = new AuthService();
 
@@ -17,5 +22,17 @@ export async function register(req: Request, res: Response) {
 }
 
 export async function logout(_req: Request, res: Response) {
+  res.status(200).json({ success: true });
+}
+
+export async function forgotPassword(req: Request, res: Response) {
+  const result = await authService.beginPasswordReset(
+    req.body as ForgotPasswordBody,
+  );
+  res.status(200).json(result);
+}
+
+export async function resetPassword(req: Request, res: Response) {
+  await authService.resetPassword(req.body as ResetPasswordBody);
   res.status(200).json({ success: true });
 }
